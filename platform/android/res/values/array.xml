@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string-array name="pinAfterMoveCaptions">
+		<item>何もしない</item>
+		<item>前へ移動</item>
+		<item>後ろへ移動</item>
+	</string-array>
+	<string-array name="pinAfterMoveValues">
+		<item>0</item>
+		<item>-1</item>
+		<item>1</item>
+	</string-array>
+	<string-array name="photoSizeCaptions">
+		<item>オリジナル</item>
+		<item>1280px</item>
+		<item>500px</item>
+		<item>400px</item>
+		<item>250px</item>
+		<item>100px</item>
+		<item>75px</item>
+	</string-array>
+	<string-array name="photoSizeValues">
+		<item>-1</item>
+		<item>1280</item>
+		<item>500</item>
+		<item>400</item>
+		<item>250</item>
+		<item>100</item>
+		<item>75</item>
+	</string-array>
+</resources>

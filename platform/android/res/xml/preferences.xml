@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+	android:title="設定">
+	<PreferenceCategory android:title="ダッシュボード">
+		<CheckBoxPreference
+			android:title="アカウント認証"
+			android:defaultValue="false"
+			android:summary="チェックをはずすとTumblr™アカウントと再度認証を行います"
+			android:key="authorized" />
+		<CheckBoxPreference
+			android:title="HTTPS接続を行う"
+			android:defaultValue="true"
+			android:summary="接続の安全性は向上しますが速度が少し遅くなります"
+			android:key="useSecureConnection" />
+		<EditTextPreference
+			android:title="ポスト要求数"
+			android:summary="一回の問い合わせで要求するポスト数"
+			android:defaultValue="20"
+			android:inputType="number"
+			android:maxLength="5"
+			android:key="requestLimit" />
+		<PreferenceScreen
+			android:title="ポストの非表示"
+			android:summary="画面に表示しない対象を設定">
+			<CheckBoxPreference
+				android:title="自分のポストを非表示"
+				android:defaultValue="false"
+				android:summary=""
+				android:key="hideMyPosts" />
+			<CheckBoxPreference
+				android:title="自分からのリブログを非表示"
+				android:defaultValue="false"
+				android:summary=""
+				android:key="hideReblogFromMyself" />
+			<CheckBoxPreference
+				android:title="テキストを非表示"
+				android:defaultValue="false"
+				android:summary=""
+				android:key="hideTextPosts" />
+			<CheckBoxPreference
+				android:title="画像を非表示"
+				android:defaultValue="false"
+				android:summary=""
+				android:key="hidePhotoPosts" />
+			<CheckBoxPreference
+				android:title="引用を非表示"
+				android:defaultValue="false"
+				android:summary=""
+				android:key="hideQuotePosts" />
+			<CheckBoxPreference
+				android:title="リンクを非表示"
+				android:defaultValue="false"
+				android:summary=""
+				android:key="hideLinkPosts" />
+			<CheckBoxPreference
+				android:title="映像を非表示"
+				android:defaultValue="false"
+				android:summary=""
+				android:key="hideVideoPosts" />
+			<CheckBoxPreference
+				android:title="音声を非表示"
+				android:defaultValue="false"
+				android:summary=""
+				android:key="hideAudioPosts" />
+			<CheckBoxPreference
+				android:title="チャットを非表示"
+				android:defaultValue="false"
+				android:summary=""
+				android:key="hideChatPosts" />
+			<CheckBoxPreference
+				android:title="質問を非表示"
+				android:defaultValue="false"
+				android:summary=""
+				android:key="hideAnswerPosts" />
+		</PreferenceScreen>
+		<ListPreference
+			android:title="画像サイズ"
+			android:summary="ポスト種別が画像の場合に表示するサイズ"
+			android:key="photoSize" 
+			android:defaultValue="400"
+			android:entries="@array/photoSizeCaptions"
+			android:entryValues="@array/photoSizeValues" />
+	</PreferenceCategory>
+	<PreferenceCategory android:title="設定">
+		<EditTextPreference
+			android:title="リトライ回数"
+			android:summary="投稿処理が失敗した場合に繰り返す回数"
+			android:defaultValue="5"
+			android:inputType="number"
+			android:maxLength="5"
+			android:key="postRetryNum" />
+		<EditTextPreference
+			android:title="タイムアウト"
+			android:summary="投稿処理の返答を待つ時間(ms単位)"
+			android:defaultValue="10000"
+			android:inputType="number"
+			android:maxLength="5"
+			android:key="postTimeout" />
+		<ListPreference
+			android:title="Pin後の動作"
+			android:summary=""
+			android:key="pinAfterMove" 
+			android:defaultValue="-1"
+			android:entries="@array/pinAfterMoveCaptions"
+			android:entryValues="@array/pinAfterMoveValues" />
+		<EditTextPreference
+			android:title="保存データパス"
+			android:summary="ポストのキャッシュなどを保存するパスの指定"
+			android:defaultValue=""
+			android:key="baseDir" />
+		<CheckBoxPreference
+			android:title="デバッグモード"
+			android:defaultValue="false"
+			android:summary=""
+			android:key="debugMode" />
+	</PreferenceCategory>
+</PreferenceScreen>
