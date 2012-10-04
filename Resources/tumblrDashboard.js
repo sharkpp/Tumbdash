@@ -430,7 +430,6 @@ self.log.debug('reblog suceess "'+e.result.text+'"');
 		options = options || {};
 		var direction   = options['direction'] || -1;
 		var pos         = options['pos'] || -1;
-		var hideMyPosts = options['hideMyPosts'] || false;
 		var fileCount = 0;
 		for (var pos = 0 <= pos && pos < self.cacheList.length ? pos : self.cacheIndex,
 			     last= 0 < direction ? self.cacheList.length : -1;
@@ -450,10 +449,24 @@ self.log.debug('reblog suceess "'+e.result.text+'"');
 			else {
 				fileCount = 0;
 			}
-			if (post &&
-				hideMyPosts &&
-				!isMyBlog.call(self, post['blog_name'])) {
-				return { success: true, result: pos };
+			if (post) {
+				var success = true;
+				if (self.hideMyPosts) {
+					success = success & !isMyBlog.call(self, post['blog_name']);
+				}
+				switch (post['type']) {
+				case 'text':   success = success & !self.hideTextPosts; break;
+				case 'quote':  success = success & !self.hideQuotePosts; break;
+				case 'link':   success = success & !self.hideLinkPosts; break;
+				case 'answer': success = success & !self.hideAnswerPosts; break;
+				case 'video':  success = success & !self.hideVideoPosts; break;
+				case 'audio':  success = success & !self.hideAudioPosts; break;
+				case 'photo':  success = success & !self.hidePhotoPosts; break;
+				case 'chat':   success = success & !self.hideChatPosts; break;
+				}
+				if (success) {
+					return { success: true, result: pos };
+				}
 			}
 		}
 		return { success: false, result: 0 < direction ? self.cacheList.length : -1 };
@@ -476,12 +489,10 @@ self.log.debug('reblog suceess "'+e.result.text+'"');
 		var cacheIndex = self.cacheIndex;
 		index--;
 		// 自分のポスト or 自分からのリブログ の場合内容をチェックする
-		if (self.hideMyPosts || self.hideReblogFromMyself) {
+		if (self.hideEnable) {
 			var result = searchPost.call(self, {
 					direction: -1,
 					pos: index,
-					hideMyPosts: self.hideMyPosts,
-					hideReblogFromMyself: self.hideReblogFromMyself,
 				});
 			if (!result.success) {
 				if (0 <= result.result) {
@@ -524,12 +535,10 @@ self.log.debug('reblog suceess "'+e.result.text+'"');
 		var cacheIndex = self.cacheIndex;
 		index++;
 		// 自分のポスト or 自分からのリブログ の場合内容をチェックする
-		if (self.hideMyPosts || self.hideReblogFromMyself) {
+		if (self.hideEnable) {
 			var result = searchPost.call(self, {
 					direction: 1,
 					pos: index,
-					hideMyPosts: self.hideMyPosts,
-					hideReblogFromMyself: self.hideReblogFromMyself,
 				});
 			if (!result.success) {
 				if (result.result < self.cacheList.length) {
@@ -926,6 +935,25 @@ self.log.debug('cache sweep stop '+self.cacheList.length);
 		self.hideMyPosts = Ti.App.Properties.getBool('hideMyPosts', false);
 		// 自分からのリブログを非表示"
 		self.hideReblogFromMyself = Ti.App.Properties.getBool('hideReblogFromMyself', false);
+		// 投稿種別で非表示
+		self.hideTextPosts   = Ti.App.Properties.getBool('hideTextPosts',   false);
+		self.hidePhotoPosts  = Ti.App.Properties.getBool('hidePhotoPosts',  false);
+		self.hideQuotePosts  = Ti.App.Properties.getBool('hideQuotePosts',  false);
+		self.hideLinkPosts   = Ti.App.Properties.getBool('hideLinkPosts',   false);
+		self.hideVideoPosts  = Ti.App.Properties.getBool('hideVideoPosts',  false);
+		self.hideAudioPosts  = Ti.App.Properties.getBool('hideAudioPosts',  false);
+		self.hideChatPosts   = Ti.App.Properties.getBool('hideChatPosts',   false);
+		self.hideAnswerPosts = Ti.App.Properties.getBool('hideAnswerPosts', false);
+		// まとめ
+		self.hideEnable = self.hideMyPosts
+		               || self.hideTextPosts
+		               || self.hidePhotoPosts
+		               || self.hideQuotePosts
+		               || self.hideLinkPosts
+		               || self.hideVideoPosts
+		               || self.hideAudioPosts
+		               || self.hideChatPosts
+		               || self.hideAnswerPosts ;
 		// 基準ディレクトリ
 		self.baseDir = Ti.App.Properties.getString('baseDir', '');
 		self.baseDir = 'file://' + self.baseDir.replace(/^file:\/\//, '');
@@ -940,6 +968,8 @@ self.log.debug('cache sweep stop '+self.cacheList.length);
 		// キャッシュ件数
 		self.cacheByPostNum      = Ti.App.Properties.getBool('cacheByPostNum', true);
 		self.cacheByPostNumValue = Ti.App.Properties.getInt('cacheByPostNumValue', 1000);
+		self.cacheByPostNumValue = 260 <= self.cacheByPostNumValue ? self.cacheByPostNumValue : 260;
+		Ti.App.Properties.setString('cacheByPostNumValue', ''+self.cacheByPostNumValue);
 		// キャッシュ期限
 		self.cacheByPostDate      = Ti.App.Properties.getBool('cacheByPostDate', false);
 		self.cacheByPostDateValue = Ti.App.Properties.getInt('cacheByPostDateValue', 3);
