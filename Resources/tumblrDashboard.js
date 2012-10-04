@@ -150,6 +150,10 @@ self.log.debug('login suceess');
 		}
 
 		requestDashboard.call(self);
+
+		fetchCommand.call(self, {
+					type: self.CMD_SWEEP_POST
+				});
 	}
 
 	function isEmptyCachedPost(id) {
@@ -466,7 +470,7 @@ self.log.debug('reblog suceess "'+e.result.text+'"');
 					{ type: self.CMD_REQ_FUTURE_POST },
 					{ type: self.CMD_PREV_POST },
 				]); }, 10);
-			return;
+			return false;
 		}
 		// 移動
 		var cacheIndex = self.cacheIndex;
@@ -492,7 +496,7 @@ self.log.debug('reblog suceess "'+e.result.text+'"');
 							{ type: self.CMD_PREV_POST, index: result.result },
 						]); }, 10);
 				}
-				return;
+				return false;
 			}
 			index = result.result;
 		}
@@ -514,7 +518,7 @@ self.log.debug('reblog suceess "'+e.result.text+'"');
 		var self  = this;
 		var index = data['index'] ? data['index'] : self.cacheIndex;
 		if (self.cacheList.length <= self.cacheIndex + 1) {
-			return;
+			return false;
 		}
 		// 移動
 		var cacheIndex = self.cacheIndex;
@@ -533,7 +537,10 @@ self.log.debug('reblog suceess "'+e.result.text+'"');
 							{ type: self.CMD_NEXT_POST, index: result.result },
 						]); }, 10);
 				}
-				return;
+				else {
+					setTimeout(function(){ self.fireEvent('loadComplite', self.post()); }, 1);
+				}
+				return false;
 			}
 			index = result.result;
 		}
@@ -572,7 +579,7 @@ self.log.debug('reblog suceess "'+e.result.text+'"');
 				}
 self.log.debug('cache sweep range '+top+'/'+last+' ('+self.cacheIndex+','+self.cacheList.length+')');
 				for (var i = self.cacheList.length - 1; 0 <= i; i--) {
-					if (top <= i && i < last) {
+					if (i < top || last <= i) {
 						self.sweepPosts.push(self.cacheList[i]);
 					}
 				}
@@ -588,7 +595,7 @@ self.log.debug('cache sweep range '+top+'/'+last+' ('+self.cacheIndex+','+self.c
 				}
 			}
 
-			if (self.sweepPosts.length) {
+			if (!self.sweepPosts.length) {
 				return;
 			}
 self.log.debug('cache sweep target '+self.sweepPosts.length);
@@ -597,20 +604,27 @@ self.log.debug('cache sweep target '+self.sweepPosts.length);
 		var timeout = false;
 		setTimeout(function() { timeout = true; }, 250);
 
-		var curId = self.cacheList[self.cacheIndex]['id'];
+		var curId = self.cacheList[self.cacheIndex];
 
 self.log.debug('cache sweep start '+self.cacheList.length);
 
 		while (self.sweepPosts.length && !timeout) {
 			var id = self.sweepPosts.shift();
 			delete self.cacheData[id];
+			var fileName = String.format("%s/%s.json", self.cacheDir, ''+id);
+			var file = Ti.Filesystem.getFile(fileName);
+self.log.debug('cache sweep delete #'+id+' "'+fileName+(file.exists()?'" (exist)':'"'));
+			if (file.exists()) {
+				file.deleteFile();
+			}
 			for (var i = 0; i < self.cacheList.length; i++) {
-				if (id == self.cacheList[i]['id']) {
+				if (id == self.cacheList[i]) {
 					if (i <= self.cacheIndex) {
 						self.cacheIndex--;
 					}
-					delete self.cacheList[i];
+					self.cacheList.splice(i,1);
 					i--;
+					break;
 				}
 			}
 		}
@@ -619,7 +633,7 @@ self.log.debug('cache sweep stop '+self.cacheList.length);
 
 		self.cacheIndex = 0;
 		for (var i = 0, num = self.cacheList.length; i < num; i++) {
-			if (currentId == self.cacheList[i]) {
+			if (curId == self.cacheList[i]) {
 				self.cacheIndex = i;
 				break;
 			}

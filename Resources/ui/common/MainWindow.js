@@ -336,10 +336,10 @@ function MainWindow(dashboard, logger, intentCall) {
 								Ti.UI.Android.openPreferences();
 							});
 
-						var menuReset = menu.add({ title : 'リセット' });
-						menuReset.addEventListener('click', function(e) {
-								dashboard.clearCache();
-							});
+//						var menuReset = menu.add({ title : 'リセット' });
+//						menuReset.addEventListener('click', function(e) {
+//								dashboard.clearCache();
+//							});
 
 						var menuAbout = menu.add({ title : '情報' });
 						menuAbout.setIcon(Ti.Android.R.drawable.ic_menu_info_details);

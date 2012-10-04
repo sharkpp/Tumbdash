@@ -83,9 +83,9 @@ exports.Tumblr = (function(global){
 		});
 
 		webView.addEventListener('beforeload', function(e){
-	//		if (!isAndroid) {
+			if (!isAndroid) {
 				webViewWindow.add(loadingOverlay);
-	//		}
+			}
 	//		actInd.hide();
 	//		actInd.show();
 		});
