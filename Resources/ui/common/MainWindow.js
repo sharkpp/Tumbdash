@@ -207,7 +207,7 @@ function MainWindow(dashboard, logger, intentCall) {
 	// ビュー
 
 	var webview = Ti.UI.createWebView(getProperties('webview'));
-	webview.html = loaderHtml;
+	webview.html = dashboard.authorized() ? loaderHtml : '';
 	view.add(webview);
 
 	var status = Ti.UI.createLabel(getProperties('status', {

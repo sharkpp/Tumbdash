@@ -75,16 +75,46 @@
 		</PreferenceScreen>
 		<ListPreference
 			android:title="画像サイズ"
-			android:summary="ポスト種別が画像の場合に表示するサイズ"
+			android:summary="ポスト種別が画像の場合の表示サイズ"
 			android:key="photoSize" 
 			android:defaultValue="400"
 			android:entries="@array/photoSizeCaptions"
 			android:entryValues="@array/photoSizeValues" />
 	</PreferenceCategory>
 	<PreferenceCategory android:title="設定">
+		<PreferenceScreen
+			android:title="キャッシュ処理"
+			android:summary="ポストなどのキャッシュ処理の動作を指定">
+			<CheckBoxPreference
+				android:title="件数でキャッシュ"
+				android:defaultValue="true"
+				android:summary=""
+				android:key="cacheByPostNum" />
+			<EditTextPreference
+				android:title="キャッシュ件数"
+				android:summary="保持できる件数を指定"
+				android:defaultValue="1000"
+				android:inputType="number"
+				android:maxLength="5"
+				android:key="cacheByPostNumValue"
+				android:dependency ="cacheByPostNum" />
+			<CheckBoxPreference
+				android:title="日数でキャッシュ"
+				android:defaultValue="false"
+				android:summary=""
+				android:key="cacheByPostDate" />
+			<EditTextPreference
+				android:title="キャッシュ期限"
+				android:summary="保持日数を指定(日単位)"
+				android:defaultValue="3"
+				android:inputType="number"
+				android:maxLength="5"
+				android:key="cacheByPostDateValue"
+				android:dependency ="cacheByPostDate" />
+		</PreferenceScreen>
 		<EditTextPreference
 			android:title="リトライ回数"
-			android:summary="投稿処理が失敗した場合に繰り返す回数"
+			android:summary="投稿処理が失敗した場合の再試行回数"
 			android:defaultValue="5"
 			android:inputType="number"
 			android:maxLength="5"

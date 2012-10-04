@@ -62,7 +62,7 @@ exports.Tumblr = (function(global){
 
 		webViewWindow.leftNavButton = closeButton;
 
-		actInd.show();
+	//	actInd.show();
 		loadingOverlay.add(actInd);
 		webViewWindow.add(loadingOverlay);
 		webViewWindow.open({modal: true});
@@ -83,17 +83,17 @@ exports.Tumblr = (function(global){
 		});
 
 		webView.addEventListener('beforeload', function(e){
-			if (!isAndroid) {
+	//		if (!isAndroid) {
 				webViewWindow.add(loadingOverlay);
-			}
-			actInd.hide();
-			actInd.show();
+	//		}
+	//		actInd.hide();
+	//		actInd.show();
 		});
 
 		webView.addEventListener('load', function(event){
 			if (event.url.indexOf(self.authorizeUrl) === -1) {
 				webViewWindow.remove(loadingOverlay);
-				actInd.hide();
+	//			actInd.hide();
 
 				if (webViewWindow.leftNavButton !== backButton) {
 					webViewWindow.leftNavButton = backButton;
@@ -130,7 +130,7 @@ exports.Tumblr = (function(global){
 				}
 			} else {
 				webViewWindow.remove(loadingOverlay);
-				actInd.hide();
+	//			actInd.hide();
 
 				if (webViewWindow.leftNavButton !== closeButton) {
 					webViewWindow.leftNavButton = closeButton;

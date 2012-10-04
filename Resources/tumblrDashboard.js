@@ -79,6 +79,8 @@ self.log.debug('login suceess');
 
 		self.reblogQueue = [];
 
+		self.sweepPosts = [];
+
 		self.postRetryNum = 5;
 		self.postTimeout = 1000;
 		self.updateProperties();
@@ -178,7 +180,8 @@ self.log.debug('login suceess');
 				if (i < cacheOutLeft || cacheOutRight < i) {
 					self.cacheData[id] = {
 							id: id,
-							reblog_key: post['reblog_key']
+							reblog_key: post['reblog_key'],
+							timestamp: post['timestamp'],
 						};
 				}
 				else if(isEmptyCachedPost.call(self, id)) {
@@ -553,6 +556,80 @@ self.log.debug('reblog suceess "'+e.result.text+'"');
 		setTimeout(function(){ fetchCommand.call(self); }, 10);
 	}
 
+	function runSweepPost(data) {
+		var self = this;
+
+		if (!self.sweepPosts.length)
+		{
+			if (self.cacheByPostNum) {
+				var top = 0, last = self.cacheByPostNumValue;
+				if (self.cacheList.length <= last) {
+					last = self.cacheList.length;
+				}
+				if (last <= self.cacheIndex) {
+					top  += self.cacheIndex - last;
+					last += self.cacheIndex - last;
+				}
+self.log.debug('cache sweep range '+top+'/'+last+' ('+self.cacheIndex+','+self.cacheList.length+')');
+				for (var i = self.cacheList.length - 1; 0 <= i; i--) {
+					if (top <= i && i < last) {
+						self.sweepPosts.push(self.cacheList[i]);
+					}
+				}
+			}
+			if (self.cacheByPostDate) {
+				var lookup = {};
+				var date = new Date.getTime();
+				date -= 24 * 60 * 60 * self.cacheByPostDateValue;
+				for (id in self.cacheData) {
+					if (self.cacheData[id]['timestamp'] < date) {
+						self.sweepPosts.unshift(self.cacheList[i]);
+					}
+				}
+			}
+
+			if (self.sweepPosts.length) {
+				return;
+			}
+self.log.debug('cache sweep target '+self.sweepPosts.length);
+		}
+
+		var timeout = false;
+		setTimeout(function() { timeout = true; }, 250);
+
+		var curId = self.cacheList[self.cacheIndex]['id'];
+
+self.log.debug('cache sweep start '+self.cacheList.length);
+
+		while (self.sweepPosts.length && !timeout) {
+			var id = self.sweepPosts.shift();
+			delete self.cacheData[id];
+			for (var i = 0; i < self.cacheList.length; i++) {
+				if (id == self.cacheList[i]['id']) {
+					if (i <= self.cacheIndex) {
+						self.cacheIndex--;
+					}
+					delete self.cacheList[i];
+					i--;
+				}
+			}
+		}
+
+self.log.debug('cache sweep stop '+self.cacheList.length);
+
+		self.cacheIndex = 0;
+		for (var i = 0, num = self.cacheList.length; i < num; i++) {
+			if (currentId == self.cacheList[i]) {
+				self.cacheIndex = i;
+				break;
+			}
+		}
+
+		self.saveCache();
+
+		setTimeout(function(){ fetchCommand.call(self); }, 10);
+	}
+
 	function fetchCommand(data) {
 		var self = this;
 		// コマンドを追加
@@ -588,9 +665,8 @@ self.log.debug('reblog suceess "'+e.result.text+'"');
 		{
 		case self.CMD_PREV_POST: runPrevPost.call(self, newCommand); return true;
 		case self.CMD_NEXT_POST: runNextPost.call(self, newCommand); return true;
-		case self.CMD_READ_POST:
-			break;
-		case self.CMD_REQ_FUTURE_POST: ; runReqFuturePost.call(self); return true;
+		case self.CMD_REQ_FUTURE_POST: runReqFuturePost.call(self); return true;
+		case self.CMD_SWEEP_POST: runSweepPost.call(self); return true;
 		}
 		return true;
 	}
@@ -601,6 +677,10 @@ self.log.debug('reblog suceess "'+e.result.text+'"');
 
 	Dashboard.prototype.getState = function() {
 		return this.state;
+	}
+
+	Dashboard.prototype.authorized = function() {
+		return this.tumblr.authorized;
 	}
 
 	Dashboard.prototype.authorize = function() {
@@ -789,7 +869,8 @@ self.log.debug('reblog suceess "'+e.result.text+'"');
 			var id   = self.cacheList[i];
 			var post = self.cacheData[id];
 			cacheList.push({ id: id,
-			                 reblog_key: post['reblog_key'] });
+			                 reblog_key: post['reblog_key'],
+			                 timestamp: post['timestamp']});
 		}
 		file = Ti.Filesystem.getFile(self.cacheListPath);
 		file.write(JSON.stringify(cacheList));
@@ -842,6 +923,12 @@ self.log.debug('reblog suceess "'+e.result.text+'"');
 		}
 		// キャッシュ一覧の保存先
 		self.cacheListPath = self.baseDir + '/dashboard.dat';
+		// キャッシュ件数
+		self.cacheByPostNum      = Ti.App.Properties.getBool('cacheByPostNum', true);
+		self.cacheByPostNumValue = Ti.App.Properties.getInt('cacheByPostNumValue', 1000);
+		// キャッシュ期限
+		self.cacheByPostDate      = Ti.App.Properties.getBool('cacheByPostDate', false);
+		self.cacheByPostDateValue = Ti.App.Properties.getInt('cacheByPostDateValue', 3);
 	}
 
 	// イベントリスナーの登録
