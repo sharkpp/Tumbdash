@@ -233,7 +233,9 @@ self.log.debug('login suceess');
 		var tumblr = this.tumblr;
 
 		if (!self.requestQue.length ||
-			self.requesting) {
+			self.requesting)
+		{
+			setTimeout(function(){ fetchCommand.call(self); }, 10);
 			return;
 		}
 
@@ -327,7 +329,7 @@ self.log.debug('dashboard request failed!');
 		}
 		if (!self.requestQue.length ||
 			undefined == self.requestQue[self.requestQue.length - 1]['since_id']) {
-			self.requestQue.push({ since_id: ''+self.cacheList[0], limit: 20 });
+			self.requestQue.push({ since_id: ''+self.cacheList[0], limit: self.postRequestLimit });
 		}
 		setTimeout(function(){ requestDashboard.call(self); }, 1);
 		return true;
@@ -428,20 +430,20 @@ self.log.debug('reblog suceess "'+e.result.text+'"');
 	function searchPost(options) {
 		var self = this;
 		options = options || {};
-		var direction   = options['direction'] || -1;
-		var pos         = options['pos'] || -1;
+		var direction   = typeof options['direction'] == 'undefined' ? -1 : options['direction'];
+		var pos         = typeof options['pos']       == 'undefined' ? -1 : options['pos'];
 		var fileCount = 0;
-		for (var pos = 0 <= pos && pos < self.cacheList.length ? pos : self.cacheIndex,
+		for (var index = 0 <= pos && pos < self.cacheList.length ? pos : self.cacheIndex,
 			     last= 0 < direction ? self.cacheList.length : -1;
-			pos != last;
-			pos += direction)
+			index != last;
+			index += direction)
 		{
-			var id = self.cacheList[pos];
+			var id = self.cacheList[index];
 			var post = self.cacheData[id];
 			if (!post['post_url']) { // からポスト？
 				fileCount++;
 				if ( 20 < fileCount ) {
-					return { success: false, result: pos };
+					return { success: false, index: index };
 				}
 				post = undefined;
 				post = readCache.call(self, id);
@@ -455,21 +457,21 @@ self.log.debug('reblog suceess "'+e.result.text+'"');
 					success = success & !isMyBlog.call(self, post['blog_name']);
 				}
 				switch (post['type']) {
-				case 'text':   success = success & !self.hideTextPosts; break;
+				case 'text':   success = success & !self.hideTextPosts;  break;
 				case 'quote':  success = success & !self.hideQuotePosts; break;
-				case 'link':   success = success & !self.hideLinkPosts; break;
-				case 'answer': success = success & !self.hideAnswerPosts; break;
+				case 'link':   success = success & !self.hideLinkPosts;  break;
+				case 'answer': success = success & !self.hideAnswerPosts;break;
 				case 'video':  success = success & !self.hideVideoPosts; break;
 				case 'audio':  success = success & !self.hideAudioPosts; break;
 				case 'photo':  success = success & !self.hidePhotoPosts; break;
-				case 'chat':   success = success & !self.hideChatPosts; break;
+				case 'chat':   success = success & !self.hideChatPosts;  break;
 				}
 				if (success) {
-					return { success: true, result: pos };
+					return { success: true, index: index };
 				}
 			}
 		}
-		return { success: false, result: 0 < direction ? self.cacheList.length : -1 };
+		return { success: false, index: 0 < direction ? self.cacheList.length : -1 };
 	}
 
 	//-----------------------------------------------------
@@ -495,21 +497,21 @@ self.log.debug('reblog suceess "'+e.result.text+'"');
 					pos: index,
 				});
 			if (!result.success) {
-				if (0 <= result.result) {
+				if (0 <= result.index) {
 					setTimeout(function(){ fetchCommand.call(self, [
-							{ type: self.CMD_PREV_POST, index: result.result },
+							{ type: self.CMD_PREV_POST, index: result.index },
 						]); }, 10);
 				}
 				else {
 					// キャッシュの左端(一番未来)の場合ポストを要求する
 					setTimeout(function(){ fetchCommand.call(self, [
 							{ type: self.CMD_REQ_FUTURE_POST },
-							{ type: self.CMD_PREV_POST, index: result.result },
+							{ type: self.CMD_PREV_POST, index: result.index },
 						]); }, 10);
 				}
 				return false;
 			}
-			index = result.result;
+			index = result.index;
 		}
 		self.cacheIndex = index;
 		//
@@ -541,9 +543,9 @@ self.log.debug('reblog suceess "'+e.result.text+'"');
 					pos: index,
 				});
 			if (!result.success) {
-				if (result.result < self.cacheList.length) {
+				if (result.index < self.cacheList.length) {
 					setTimeout(function(){ fetchCommand.call(self, [
-							{ type: self.CMD_NEXT_POST, index: result.result },
+							{ type: self.CMD_NEXT_POST, index: result.index },
 						]); }, 10);
 				}
 				else {
@@ -551,7 +553,7 @@ self.log.debug('reblog suceess "'+e.result.text+'"');
 				}
 				return false;
 			}
-			index = result.result;
+			index = result.index;
 		}
 		self.cacheIndex = index;
 		//
@@ -569,7 +571,6 @@ self.log.debug('reblog suceess "'+e.result.text+'"');
 	function runReqFuturePost(data) {
 		var self = this;
 		requestFuturePosts.call(self);
-		setTimeout(function(){ fetchCommand.call(self); }, 10);
 	}
 
 	function runSweepPost(data) {
