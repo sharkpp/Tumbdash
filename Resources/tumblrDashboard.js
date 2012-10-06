@@ -478,13 +478,19 @@ self.log.debug('reblog suceess "'+e.result.text+'"');
 
 	function runPrevPost(data) {
 		var self  = this;
-		var index = data['index'] ? data['index'] : self.cacheIndex;
+		var index = typeof data['index'] == 'undefined' ? self.cacheIndex : data['index'];
+		var reclusive = typeof data['reclusive'] != 'undefined';
 		if (self.cacheIndex < 1) {
 			// キャッシュの左端(一番未来)の場合ポストを要求する
-			setTimeout(function(){ fetchCommand.call(self, [
-					{ type: self.CMD_REQ_FUTURE_POST },
-					{ type: self.CMD_PREV_POST },
-				]); }, 10);
+			if (!reclusive) {
+				setTimeout(function(){ fetchCommand.call(self, [
+						{ type: self.CMD_REQ_FUTURE_POST },
+						{ type: self.CMD_PREV_POST, reclusive: true },
+					]); }, 10);
+			}
+			else {
+				setTimeout(function(){ self.fireEvent('loadComplite', self.post()); }, 1);
+			}
 			return false;
 		}
 		// 移動
@@ -529,7 +535,7 @@ self.log.debug('reblog suceess "'+e.result.text+'"');
 
 	function runNextPost(data) {
 		var self  = this;
-		var index = data['index'] ? data['index'] : self.cacheIndex;
+		var index = typeof data['index'] == 'undefined' ? self.cacheIndex : data['index'];
 		if (self.cacheList.length <= self.cacheIndex + 1) {
 			return false;
 		}
