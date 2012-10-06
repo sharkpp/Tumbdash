@@ -74,7 +74,8 @@ exports.tumblrPost = (function(global){
 	function applyTemplate(template, data) {
 		var result = template;
 		for (key in data) {
-			result = result.replace('{'+key+'}', data[key]);
+			result = result.replace('{'+key+'}', data[key])
+			               .replace('{'+key+':escape}', escape(data[key]));
 		}
 		return result;
 	}
@@ -89,8 +90,6 @@ exports.tumblrPost = (function(global){
 		var self = this;
 		var photoset = '';
 		var photos = post['photos'];
-//var file = Ti.Filesystem.getFile(self.templateDir + '/log.log');
-//file.write(file.read()+"--------\n" + JSON.stringify(post)+"\n");
 		for (var i = 0, photo; photo = photos[i]; i++) {
 			var disp_photo = { url: '', width: 0 };
 			if (self.photoSize < 0 && photo['original_size']) {
@@ -130,7 +129,18 @@ exports.tumblrPost = (function(global){
 
 	// 'video'を描画
 	function renderVideoPost(post) {
-		return applyTemplate.call(this, this.template['video'], post);
+		var self = this;
+		var players = post['player'];
+		var embed_code = '';
+		for (var i = 0, player; player = players[i]; i++) {
+			embed_code = player['embed_code'];
+		}
+		var data = {};
+		for (key in post) {
+			data[key] = post[key];
+		}
+		data['embed_code'] = embed_code;
+		return applyTemplate.call(self, self.template['video'], data);
 	}
 
 	// 'audio'を描画
