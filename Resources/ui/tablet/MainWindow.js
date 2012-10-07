@@ -1,31 +1,102 @@
 //MainWindow Component Constructor
 exports.MainWindow = function() {
 	return {
-			'toolbar': {
-					height:50,
-					bottom:0,
-					borderWidth:1,
-					borderColor:'#999',
-					backgroundColor:'white',
-					zIndex:'99'
-				},
 			'webview': {
 					backgroundColor: '#fff',
+					top: '0%',
+					bottom: '48dp',
+				},
+			'status': {
+					top: '5dp',
+					right: '30dp',
+					width: '64dp',
+					height: '20dp',
+					backgroundColor: '#8000',
+					borderRadius: 10,
+					color : '#fff',
+					backgroundSelectedColor: '#fff',
+					textAlign: 'center',
+				},
+			'pin-status': {
+					top: '5dp',
+					right: '5dp',
+					width: '20dp',
+					height: '20dp',
+					backgroundColor: '#8000',
+					borderRadius: 10,
+					color : '#fff',
+					backgroundSelectedColor: '#fff',
+				},
+			'console': {
+					backgroundColor: '#6000',
+					top: '35dp',
+					left: '10dp',
+					right: '50dp',
+					bottom: '58dp',
+					borderRadius: 10,
+					color : '#fff',
+					backgroundSelectedColor: '#0000',
+					textAlign: 'left',
+					textAlign: 'left',
+				},
+			'toolbar': {
+					height: '48dp',
+					bottom: 0,
+					backgroundColor:'#356',
+				},
+			'toolbar-button-inner': {
+					height:'32dp',
+					width: '32dp',
+				},
+			'toolbar-like-button': {
+					left:  '0dp',
+					top:   '0dp',
+					height:'100%',
+					width: '20%',
 					borderRadius: 15,
-					borderWidth : 5,
-					borderColor : 'red'
+					backgroundSelectedColor: '#ccc',
+				},
+			'toolbar-reblog-button': {
+					left:  '20%',
+					top:   '0dp',
+					height:'100%',
+					width: '20%',
+					borderRadius: 15,
+					backgroundSelectedColor: '#ccc',
 				},
 			'toolbar-prev-button': {
-					left: '10%',
-					height:45,
-					width: 50,
-					title:'prev'
+					left:  '40%',
+					top:   '0dp',
+					height:'100%',
+					width: '20%',
+					borderRadius: 15,
+					backgroundSelectedColor: '#ccc',
 				},
 			'toolbar-next-button': {
-					left: '20%',
-					height:50,
-					width: 50,
-					title:'next'
+					left:  '60%',
+					top:   '0dp',
+					height:'100%',
+					width: '20%',
+					borderRadius: 15,
+					backgroundSelectedColor: '#ccc',
+				},
+			'toolbar-pin-button': {
+					left:  '80%',
+					top:   '0dp',
+					height:'100%',
+					width: '20%',
+					borderRadius: 15,
+					backgroundSelectedColor: '#ccc',
+				},
+			'toolbar-pin-badge': {
+					right:  '2dp',
+					top:   '2dp',
+					height:'20dp',
+					width: '48dp',
+					backgroundColor: 'red',
+					borderRadius: 10,
+					color: '#fff',
+					textAlign: 'center',
 				}
 		};
 }
