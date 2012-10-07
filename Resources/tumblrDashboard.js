@@ -107,8 +107,8 @@ self.log.debug('login suceess');
 
 	Dashboard.prototype.CMD_PREV_POST       = 0; // 前のPOSTを取得
 	Dashboard.prototype.CMD_NEXT_POST       = 1; // 次のPOSTを取得
-	Dashboard.prototype.CMD_READ_POST       = 2; // 
-	Dashboard.prototype.CMD_REQ_FUTURE_POST = 3; // 
+	Dashboard.prototype.CMD_REQ_FUTURE_POST = 2; // 
+	Dashboard.prototype.CMD_SWEEP_POST      = 3; // 
 
 	function updateBlogsInfo(blogs) {
 		var self   = this;
@@ -737,6 +737,11 @@ self.log.debug('cache sweep stop '+self.cacheList.length);
 		tumblr.authorize();
 	}
 
+	// PIN状態をクリア
+	Dashboard.prototype.pinClear = function() {
+		this.pinBuffer = [];
+	}
+
 	// PIN数を取得
 	Dashboard.prototype.totalPin = function() {
 		return this.pinBuffer.length;
@@ -822,12 +827,11 @@ self.log.debug('cache sweep stop '+self.cacheList.length);
 	Dashboard.prototype.reblog = function(id) {
 		var self = this;
 		var idList = [];
-		// self.blog['hostname']
 		if (self.pinBuffer.length) {
 			idList = self.pinBuffer;
 		}
 		else {
-			idList.pish(id);
+			idList.pish(id || self.currentId());
 		}
 		for (var i = 0, id; id = idList[i]; i++) {
 			self.reblogQueue.push({
@@ -886,6 +890,19 @@ self.log.debug('cache sweep stop '+self.cacheList.length);
 				break;
 			}
 		}
+
+		// pinBuffer
+		file = Ti.Filesystem.getFile(self.pinQueuePath);
+		data = file.read();
+		if (!data || data.length <= 0) {
+			data = '{}';
+		}
+		var pinBuffer = JSON.parse(data);
+		self.pinBuffer = [];
+		for (var i = 0, num = pinBuffer.length; i < num; i++) {
+			var id = pinBuffer[i]['id'];
+			self.pinBuffer.push(id);
+		}
 	}
 
 	// キャッシュを保存
@@ -908,6 +925,16 @@ self.log.debug('cache sweep stop '+self.cacheList.length);
 		// cacheIndex
 		var lastId = self.currentId();
 		Ti.App.Properties.setString('lastId', lastId);
+
+		// pinBuffer
+		var pinBuffer = [];
+		for (var i = 0, num = self.pinBuffer.length; i < num; i++) {
+			var id   = self.pinBuffer[i];
+			var post = self.cacheData[id];
+			pinBuffer.push({ id: id });
+		}
+		file = Ti.Filesystem.getFile(self.pinQueuePath);
+		file.write(JSON.stringify(pinBuffer));
 	}
 
 	// キャッシュをクリア
@@ -972,6 +999,8 @@ self.log.debug('cache sweep stop '+self.cacheList.length);
 		}
 		// キャッシュ一覧の保存先
 		self.cacheListPath = self.baseDir + '/dashboard.dat';
+		// pin一覧の保存先
+		self.pinQueuePath = self.baseDir + '/pin.dat';
 		// キャッシュ件数
 		self.cacheByPostNum      = Ti.App.Properties.getBool('cacheByPostNum', true);
 		self.cacheByPostNumValue = Ti.App.Properties.getInt('cacheByPostNumValue', 1000);

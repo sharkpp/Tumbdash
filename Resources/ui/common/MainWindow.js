@@ -39,12 +39,15 @@ function MainWindow(dashboard, logger) {
 
 	var cacheLoaded = false;
 
-	var pinAfterMove;
+	var pinAfterMove, savePinState;
 	var updateProperties = function()
 	{
+		// Pin指定後の動作
 		pinAfterMove = parseInt(Ti.App.Properties.getString('pinAfterMove', '-1'));
 		pinAfterMove = -1 == pinAfterMove || 0 == pinAfterMove || 1 == pinAfterMove ? pinAfterMove : -1;
 		Ti.App.Properties.setString('pinAfterMove', '' + pinAfterMove);
+		//
+		savePinState = Ti.App.Properties.getBool('savePinState', false);
 		// 基準ディレクトリ
 		var baseDirPath = Ti.App.Properties.getString('baseDir', '');
 		    baseDirPath = baseDirPath ? 'file://' + baseDirPath.replace(/^file:\/\//, '') : '';
@@ -64,10 +67,10 @@ function MainWindow(dashboard, logger) {
 			baseDir.createDirectory();
 		}
 		Ti.App.Properties.setString('baseDir', baseDir.nativePath.replace(/^file:\/\//, ''));
-		//
+		// デバッグモード
 		var debugMode = Ti.App.Properties.getBool('debugMode', false);
 		debugConsole.visible = debugMode;
-		//
+		// ログレベル指定
 		logger.setBaseDir(baseDir.nativePath);
 		logger.setLogLevel(debugMode ? logger.LEVEL_DEBUG : logger.LEVEL_NONE);
 	}
@@ -316,6 +319,13 @@ function MainWindow(dashboard, logger) {
 	if (isAndroid) {
 		self.addEventListener('open', function(){
 				var activity = self.activity; // openの後でないと取得できない
+				activity.addEventListener('resume', function() {
+						dashboard.loadCache();
+					});
+				activity.addEventListener('pause', function() {
+logger.debug('pause');
+						dashboard.saveCache();
+					});
 				activity.onCreateOptionsMenu = function(e) {
 						menu = e.menu; // save off menu.
 						
@@ -367,7 +377,10 @@ function MainWindow(dashboard, logger) {
 		});
 
 	self.addEventListener('close', function(){
-			dashboard.saveCache();
+logger.debug('close');
+			if (!savePinState) {
+				dashboard.pinClear();
+			}
 		});
 
 	self.addEventListener('focus', function(){
@@ -382,16 +395,11 @@ function MainWindow(dashboard, logger) {
 			}
 		});
 
-//	if (isAndroid) {
-//		self.addEventListener('android:back', function(){
-//				self.close();
-//			});
-//	}
-
 	dashboard.addEventListener('login', function(e) {
 			if (e.success) {
 				Ti.App.Properties.setBool('authorized', true);
 			}
+			dashboard.fireEvent('updatePin');
 			// デバッグ
 			updateConsole();
 		});

@@ -49,9 +49,9 @@ exports.create = (function(global){
 		                                                    : date.getYear();
 		var fileName = String.format('%s/%04d%02d%02d.log'
 							, self.baseDir
-							, year, date.getMonth() + 1, date.getDay());
+							, year, date.getMonth() + 1, date.getDate());
 		data = String.format("%04d-%02d-%02d %02d:%02d:%02d.%03d [%s] %s\n"
-							, year, date.getMonth() + 1, date.getDay()
+							, year, date.getMonth() + 1, date.getDate()
 							, date.getHours(), date.getMinutes(), date.getSeconds()
 							, date.getMilliseconds()
 							, levelText[level], message);
