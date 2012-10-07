@@ -73,9 +73,21 @@
 				android:summary=""
 				android:key="hideAnswerPosts" />
 		</PreferenceScreen>
+	</PreferenceCategory>
+	<PreferenceCategory android:title="ポスト">
+		<CheckBoxPreference
+			android:title="映像の自動表示"
+			android:defaultValue="false"
+			android:summary="埋め込み映像を自動で読み込むかどうか"
+			android:key="autoLoadVideo" />
+		<CheckBoxPreference
+			android:title="複数枚の画像を自動表示"
+			android:defaultValue="true"
+			android:summary="２枚目以降の画像もポスト表示時に読み込むかどうか"
+			android:key="autoLoadPhotoset" />
 		<ListPreference
-			android:title="画像サイズ"
-			android:summary="ポスト種別が画像の場合の表示サイズ"
+			android:title="画像取得サイズ"
+			android:summary="ポスト種別が画像の場合の取得サイズ"
 			android:key="photoSize" 
 			android:defaultValue="400"
 			android:entries="@array/photoSizeCaptions"

@@ -10,17 +10,17 @@
 				delete this.onclick;
 			};
 		photo.onload = function(e){
-				if (!this.getAttribute("data-url")) {
-					this.style.cssText = "width:100%; height:auto";
-					delete this.onload;
-				}
-				else if (!this.getAttribute("data-loading")) {
+				if (!this.getAttribute("data-loading")) {
 					var url = this.getAttribute("data-url");
 					          this.setAttribute("data-url", "")
 					this.src = url;
 				}
+				else if (!this.getAttribute("data-url")) {
+					this.style.cssText = "width:100%; height:auto;";
+					delete this.onload;
+				}
 			};
-		if (0 == i) {
+		if (0 == i || {autoLoadPhotoset:pref}) {
 			(photo.onclick)();
 		}
 	}

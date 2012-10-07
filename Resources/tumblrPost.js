@@ -72,13 +72,19 @@ exports.tumblrPost = (function(global){
 
 	// テンプレートを適用
 	function applyTemplate(template, data) {
+		var self = this;
 		var result = template;
+		// ポストを置換
 		for (key in data) {
-			result = result.replace('{'+key+'}', data[key])
-			               .replace('{'+key+':escape}', escape(data[key]));
+			result = result.split('{'+key+'}').join(data[key])
+			               .split('{'+key+':escape}').join(escape(data[key]));
 		}
+		// 設定を置換
+	    result = result.replace(/{([a-zA-Z_]+):pref}/g, function(ma, key) {
+							return "undefined" != typeof self.pref[key] ? self.pref[key] : '';
+						});
 		// 置換できていないものをクリア
-		result = result.replace(/{[a-zA-Z:_]+?}/, '');
+		result = result.replace(/{[a-zA-Z:_]+}/g, '');
 		return result;
 	}
 
@@ -197,11 +203,20 @@ exports.tumblrPost = (function(global){
 		var self = this;
 		// デバッグモード
 		self.debugMode = Ti.App.Properties.getBool('debugMode', false)
+		// 映像の自動表示
+		self.autoLoadVideo = Ti.App.Properties.getBool('autoLoadVideo', false);
+		// 複数枚の画像を自動表示
+		self.autoLoadPhotoset = Ti.App.Properties.getBool('autoLoadPhotoset', true);
 		// 画像サイズ
 		self.photoSize = Ti.App.Properties.getInt('photoSize', 400);
 		// 基準ディレクトリ
 		self.baseDir = Ti.App.Properties.getString('baseDir', '');
 		self.baseDir = 'file://' + self.baseDir.replace(/^file:\/\//, '');
+		//
+		self.pref = {
+				autoLoadVideo:    self.autoLoadVideo    ? 'true' : 'false',
+				autoLoadPhotoset: self.autoLoadPhotoset ? 'true' : 'false',
+			};
 	}
 
 	return tumblrPost;

@@ -55,25 +55,11 @@ function notify(msg) {
 
 	var dashboard = require('tumblrDashboard').Dashboard(tumblr, logger);
 
-	var intent = Ti.Android.currentActivity.getIntent();
-	var intentCall = false;
-	if (intent) {
-//Ti.UI.createNotification({message:'intent:'+intent.getData()}).show();
-		intentCall = intent.getData() ? true : false;
-	}
-
 	var tabGroup = Ti.UI.createTabGroup();
-
-	if (intentCall) {
-		var AuthWindow = require('ui/common/AuthWindow');
-		var wnd = new AuthWindow(dashboard);
-		wnd.open();
-		return;
-	}
 
 	// メインウインドウ構築
 	var Window = require('ui/common/MainWindow');
-	var wnd = new Window(dashboard, logger, intentCall);
+	var wnd = new Window(dashboard, logger);
 
 	var mainTab = Ti.UI.createTab({ window: wnd });
 	wnd.containingTab = mainTab;

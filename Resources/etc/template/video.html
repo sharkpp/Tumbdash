@@ -6,4 +6,7 @@
 			this.innerHTML = unescape('{embed_code:escape}');
 			delete this.onclick;
 		};
+	if ({autoLoadVideo:pref}) {
+		(player.onclick)();
+	}
 </script>

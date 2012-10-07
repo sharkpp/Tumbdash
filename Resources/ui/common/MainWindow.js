@@ -1,6 +1,6 @@
 //MainWindow Component Constructor
 
-function MainWindow(dashboard, logger, intentCall) {
+function MainWindow(dashboard, logger) {
 	//determine platform and form factor and render approproate components
 	var osname  = Ti.Platform.osname,
 		version = Ti.Platform.version,
@@ -172,22 +172,6 @@ function MainWindow(dashboard, logger, intentCall) {
 	var path = Ti.Filesystem.resourcesDirectory + '/etc/loader.html';
 	var file = Ti.Filesystem.getFile(path);
 	var loaderHtml = file.read().toString();
-//	    loaderHtml = loaderHtml.replace(/(<img src=)"(.+?)"/, function(ma, tag, src) { // '
-//						var imageView = Titenium.UI.createImageView({ image：'src' });
-//						var data = imageView.toBlob();
-//						//	var path = Ti.Filesystem.resourcesDirectory + '/android/images/' + src;
-//						//	var file = Ti.Filesystem.getFile(path);
-//						//	var data = file.read();
-//						//	if (!data || !data.length) {
-//						//		path = Ti.Filesystem.resourcesDirectory + '/etc/' + src;
-//						//		file = Ti.Filesystem.getFile(path);
-//						//		data = file.read();
-//						//		if (!data || !data.length) {
-//						//			return;
-//						//		}
-//						//	}
-//							return ''+ tag + '"data:image/gif;base64,' + Ti.Utils.base64encode(data).toString() + '"';
-//						});
 
 	//
 	
