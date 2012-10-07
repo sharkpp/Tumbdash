@@ -172,20 +172,22 @@ function MainWindow(dashboard, logger, intentCall) {
 	var path = Ti.Filesystem.resourcesDirectory + '/etc/loader.html';
 	var file = Ti.Filesystem.getFile(path);
 	var loaderHtml = file.read().toString();
-	    loaderHtml = loaderHtml.replace(/(<img src=)"(.+?)"/, function(ma, tag, src) { // '
-							var path = Ti.Filesystem.resourcesDirectory + '/android/images/' + src;
-							var file = Ti.Filesystem.getFile(path);
-							var data = file.read();
-							if (!data || !data.length) {
-								path = Ti.Filesystem.resourcesDirectory + '/etc/' + src;
-								file = Ti.Filesystem.getFile(path);
-								data = file.read();
-								if (!data || !data.length) {
-									return;
-								}
-							}
-							return ''+ tag + '"data:image/gif;base64,' + Ti.Utils.base64encode(data).toString() + '"';
-						});
+//	    loaderHtml = loaderHtml.replace(/(<img src=)"(.+?)"/, function(ma, tag, src) { // '
+//						var imageView = Titenium.UI.createImageView({ image：'src' });
+//						var data = imageView.toBlob();
+//						//	var path = Ti.Filesystem.resourcesDirectory + '/android/images/' + src;
+//						//	var file = Ti.Filesystem.getFile(path);
+//						//	var data = file.read();
+//						//	if (!data || !data.length) {
+//						//		path = Ti.Filesystem.resourcesDirectory + '/etc/' + src;
+//						//		file = Ti.Filesystem.getFile(path);
+//						//		data = file.read();
+//						//		if (!data || !data.length) {
+//						//			return;
+//						//		}
+//						//	}
+//							return ''+ tag + '"data:image/gif;base64,' + Ti.Utils.base64encode(data).toString() + '"';
+//						});
 
 	//
 	
@@ -228,6 +230,10 @@ function MainWindow(dashboard, logger, intentCall) {
 							editable: false,
 						}));
 	debugConsole.visible = true;
+	debugConsole.addEventListener('click', function() {
+			debugConsole.visible = false;
+			setTimeout(function(){ debugConsole.visible = true; }, 10000);
+		});
 	view.add(debugConsole);
 
 	// ツールバー

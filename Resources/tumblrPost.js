@@ -77,6 +77,8 @@ exports.tumblrPost = (function(global){
 			result = result.replace('{'+key+'}', data[key])
 			               .replace('{'+key+':escape}', escape(data[key]));
 		}
+		// 置換できていないものをクリア
+		result = result.replace(/{[a-zA-Z:_]+?}/, '');
 		return result;
 	}
 

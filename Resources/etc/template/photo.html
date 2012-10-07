@@ -1,2 +1,27 @@
 {photos}
 <div id="caption">{caption}</div>
+<script>
+	var photoset = document.getElementsByTagName('img');
+	for (var i = 0, photo; photo = photoset[i]; i++) {
+		photo.onclick = function(e){
+				var url = this.getAttribute("data-loading");
+				          this.setAttribute("data-loading", "")
+				this.src = url;
+				delete this.onclick;
+			};
+		photo.onload = function(e){
+				if (!this.getAttribute("data-url")) {
+					this.style.cssText = "width:100%; height:auto";
+					delete this.onload;
+				}
+				else if (!this.getAttribute("data-loading")) {
+					var url = this.getAttribute("data-url");
+					          this.setAttribute("data-url", "")
+					this.src = url;
+				}
+			};
+		if (0 == i) {
+			(photo.onclick)();
+		}
+	}
+</script>

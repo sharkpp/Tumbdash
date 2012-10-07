@@ -4,9 +4,6 @@
 	var player = document.getElementById('player');
 	player.onclick = function(){
 			this.innerHTML = unescape('{embed_code:escape}');
-		//	var iframes = document.getElementsByTagName('iframe'); 
-		//	for (var i = 0, iframe; iframe = iframes[i]; i++) {
-		//		iframe.style.cssText  = 'width:100%; height:auto';
-		//	}
+			delete this.onclick;
 		};
 </script>
