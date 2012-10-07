@@ -3,7 +3,12 @@
 <script>
 	var player = document.getElementById('player');
 	player.onclick = function(){
+			var w = this.firstChild.offsetWidth;
+			var h = this.firstChild.offsetHeight;
 			this.innerHTML = unescape('{embed_code:escape}');
+			this.firstChild.style.cssText = "";
+			this.firstChild.style.width  = '' + w + 'px';
+			this.firstChild.style.height = '' + h + 'px';
 			delete this.onclick;
 		};
 	if ({autoLoadVideo:pref}) {

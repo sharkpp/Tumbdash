@@ -1,0 +1,14 @@
+<div id="album_art"><img src="{album_art}" style="width:100%; height:auto" /></div>
+<div id="player"><img src="etc/audio.png" style="width: auto; height:auto" /></div>
+<p id="caption">{title}</p>
+<script>
+	var player = document.getElementById('player');
+	player.onclick = function(){
+			this.innerHTML = unescape('{player:escape}');
+			this.firstChild.style.cssText = "";
+			delete this.onclick;
+		};
+	if ({autoLoadAudio:pref}) {
+		(player.onclick)();
+	}
+</script>

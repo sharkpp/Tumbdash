@@ -153,7 +153,15 @@ exports.tumblrPost = (function(global){
 
 	// 'audio'を描画
 	function renderAudioPost(post) {
-		return applyTemplate.call(this, this.template['audio'], post);
+		var self = this;
+		var data = {};
+		for (key in post) {
+			data[key] = post[key];
+		}
+		if (!self.showAudioAlbumArt) { // アルバムアートを表示
+			delete data['album_art'];
+		}
+		return applyTemplate.call(this, this.template['audio'], data);
 	}
 
 	// 'chat'を描画
@@ -205,6 +213,10 @@ exports.tumblrPost = (function(global){
 		self.debugMode = Ti.App.Properties.getBool('debugMode', false)
 		// 映像の自動表示
 		self.autoLoadVideo = Ti.App.Properties.getBool('autoLoadVideo', false);
+		// 音楽の自動表示
+		self.autoLoadAudio = Ti.App.Properties.getBool('autoLoadAudio', false);
+		// アルバムアートを表示"
+		self.showAudioAlbumArt = Ti.App.Properties.getBool('showAudioAlbumArt', true);
 		// 複数枚の画像を自動表示
 		self.autoLoadPhotoset = Ti.App.Properties.getBool('autoLoadPhotoset', true);
 		// 画像サイズ
@@ -215,6 +227,7 @@ exports.tumblrPost = (function(global){
 		//
 		self.pref = {
 				autoLoadVideo:    self.autoLoadVideo    ? 'true' : 'false',
+				autoLoadAudio:    self.autoLoadAudio    ? 'true' : 'false',
 				autoLoadPhotoset: self.autoLoadPhotoset ? 'true' : 'false',
 			};
 	}
