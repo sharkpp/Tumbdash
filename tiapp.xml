@@ -7,7 +7,7 @@
         <target device="android">true</target>
         <target device="blackberry">false</target>
     </deployment-targets>
-    <sdk-version>2.1.2.GA</sdk-version>
+    <sdk-version>2.1.3.GA</sdk-version>
     <id>net.sharkpp.Tumbdash</id>
     <name>Tumbdash</name>
     <version>1.0.0</version>
@@ -36,7 +36,12 @@
             <orientation>Ti.UI.LANDSCAPE_RIGHT</orientation>
         </orientations>
     </iphone>
-    <android xmlns:android="http://schemas.android.com/apk/res/android"/>
+    <android xmlns:android="http://schemas.android.com/apk/res/android">
+        <tool-api-level>8</tool-api-level>
+        <manifest android:installLocation="auto">
+            <uses-sdk android:minSdkVersion="7" />
+        </manifest>
+    </android>
     <mobileweb>
         <precache/>
         <splash>

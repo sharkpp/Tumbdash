@@ -328,7 +328,14 @@ logger.debug('pause');
 					});
 				activity.onCreateOptionsMenu = function(e) {
 						menu = e.menu; // save off menu.
-						
+
+						var pinClear = menu.add({ title : 'Pinのクリア' });
+						pinClear.setIcon(Ti.Android.R.drawable.ic_menu_delete);
+						pinClear.addEventListener('click', function(e) {
+								dashboard.pinClear();
+								dashboard.fireEvent('updatePin');
+							});
+
 						var menuOption = menu.add({ title : '設定' });
 						menuOption.setIcon(Ti.Android.R.drawable.ic_menu_preferences);
 						menuOption.addEventListener('click', function(e) {
