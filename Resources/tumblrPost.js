@@ -20,18 +20,9 @@ exports.tumblrPost = (function(global){
 
 		self.log = logger;
 
-		self.photoSize = 400;
+		self.baseDir_ = ''; // 基準ディレクトリが変化したか？のチェック用
 		self.updateProperties();
 		//Ti.Platform.displayCaps.platformWidth
-
-		// テンプレートディレクトリ
-		self.templateDir = self.baseDir + '/template';
-		var templateDir = Ti.Filesystem.getFile(self.templateDir);
-		if (!templateDir.exists()) {
-			templateDir.createDirectory();
-		}
-
-		loadTemplate.call(self);
 
 		return self;
 	};
@@ -61,10 +52,15 @@ exports.tumblrPost = (function(global){
 			if (!data || !data.length) {
 				// アプリケーションデータから読めなかった場合、
 				// リソースディレクトリから初期データを読み込み
-				var path2 = Ti.Filesystem.resourcesDirectory + '/etc/template/' + postTemplates[name];
+				var path2 = Ti.Filesystem.resourcesDirectory + 'etc/template/' + postTemplates[name];
 				var file2 = Ti.Filesystem.getFile(path2);
 				data = file2.read();
-				file.write(data);
+				if (data && data.length) {
+					file.write(data);
+				}
+				else {
+					data = '';
+				}
 			}
 			self.template[name] = data.toString();
 		}
@@ -230,6 +226,16 @@ exports.tumblrPost = (function(global){
 				autoLoadAudio:    self.autoLoadAudio    ? 'true' : 'false',
 				autoLoadPhotoset: self.autoLoadPhotoset ? 'true' : 'false',
 			};
+		// テンプレートディレクトリ
+		self.templateDir = self.baseDir + '/template';
+		var templateDir = Ti.Filesystem.getFile(self.templateDir);
+		if (!templateDir.exists()) {
+			templateDir.createDirectory();
+		}
+		if (self.baseDir != self.baseDir_) {
+			loadTemplate.call(self);
+			self.baseDir_ = self.baseDir;	
+		}
 	}
 
 	return tumblrPost;

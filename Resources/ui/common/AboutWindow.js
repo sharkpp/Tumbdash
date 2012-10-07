@@ -21,7 +21,7 @@ function AboutWindow() {
 
 	// ビュー
 
-	var path = Ti.Filesystem.resourcesDirectory + '/etc/about.html';
+	var path = Ti.Filesystem.resourcesDirectory + 'etc/about.html';
 	var file = Ti.Filesystem.getFile(path);
 	var data = file.read().toString();
 	data = data.replace('{app_name}',        Ti.App.name)

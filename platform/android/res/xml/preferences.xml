@@ -129,6 +129,11 @@
 				android:key="cacheByPostDateValue"
 				android:dependency ="cacheByPostDate" />
 		</PreferenceScreen>
+		<CheckBoxPreference
+			android:title="Pinの状態を保存する"
+			android:defaultValue="false"
+			android:summary=""
+			android:key="savePinState" />
 		<EditTextPreference
 			android:title="リトライ回数"
 			android:summary="投稿処理が失敗した場合の再試行回数"

@@ -172,7 +172,7 @@ function MainWindow(dashboard, logger) {
 		}
 	}
 
-	var path = Ti.Filesystem.resourcesDirectory + '/etc/loader.html';
+	var path = Ti.Filesystem.resourcesDirectory + 'etc/loader.html';
 	var file = Ti.Filesystem.getFile(path);
 	var loaderHtml = file.read().toString();
 
