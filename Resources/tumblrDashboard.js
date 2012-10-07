@@ -831,7 +831,7 @@ self.log.debug('cache sweep stop '+self.cacheList.length);
 			idList = self.pinBuffer;
 		}
 		else {
-			idList.pish(id || self.currentId());
+			idList.push(id || self.currentId());
 		}
 		for (var i = 0, id; id = idList[i]; i++) {
 			self.reblogQueue.push({
@@ -841,7 +841,7 @@ self.log.debug('cache sweep stop '+self.cacheList.length);
 					retry: 0,
 				});
 		}
-		setTimeout(function(){ self.fireEvent('reblogStart'); }, 1);
+		setTimeout(function(){ self.fireEvent('reblogStart', self.reblogQueue.length); }, 1);
 		//
 		doReblog.call(self);
 	}

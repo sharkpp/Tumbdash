@@ -512,12 +512,11 @@ logger.debug('close');
 			updateConsole();
 		});
 
-	dashboard.addEventListener('reblogStart', function() {
+	dashboard.addEventListener('reblogStart', function(reblogNum) {
 			if (isAndroid) {
-				var pinNum = dashboard.totalPin();
 				progress.message = 'リブログ中 ...';
 				progress.min = 0;
-				progress.max = pinNum;
+				progress.max = reblogNum;
 				progress.value = 0;
 				progress.show();
 			}
