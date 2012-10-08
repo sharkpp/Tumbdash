@@ -129,6 +129,12 @@
 				android:key="cacheByPostDateValue"
 				android:dependency ="cacheByPostDate" />
 		</PreferenceScreen>
+		<EditTextPreference
+			android:title="タグ"
+			android:defaultValue=""
+			android:inputType="textMultiLine"
+			android:summary="リブログ時に設定するタグ(１行で１組、カンマ区切りで複数タグ)"
+			android:key="tagsForReblog" />
 		<CheckBoxPreference
 			android:title="Pinの状態を保存する"
 			android:defaultValue="false"

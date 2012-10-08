@@ -40,14 +40,24 @@ function MainWindow(dashboard, logger) {
 	var cacheLoaded = false;
 
 	var pinAfterMove, savePinState;
+	var tagsForReblog = '';
+
 	var updateProperties = function()
 	{
 		// Pin指定後の動作
 		pinAfterMove = parseInt(Ti.App.Properties.getString('pinAfterMove', '-1'));
 		pinAfterMove = -1 == pinAfterMove || 0 == pinAfterMove || 1 == pinAfterMove ? pinAfterMove : -1;
 		Ti.App.Properties.setString('pinAfterMove', '' + pinAfterMove);
-		//
+		// Pinの状態を保存する
 		savePinState = Ti.App.Properties.getBool('savePinState', false);
+		// タグ
+		tagsForReblog = Ti.App.Properties.getString('tagsForReblog', '');
+		tagsForReblog = tagsForReblog.split(/[\n\r]/);
+		for(var i = tagsForReblog.length - 1; 0 <= i; i--) {
+			if (!tagsForReblog[i].length) {
+				tagsForReblog.splice(i, 1);
+			}
+		}
 		// 基準ディレクトリ
 		var baseDirPath = Ti.App.Properties.getString('baseDir', '');
 		    baseDirPath = baseDirPath ? 'file://' + baseDirPath.replace(/^file:\/\//, '') : '';
@@ -73,6 +83,7 @@ function MainWindow(dashboard, logger) {
 		// ログレベル指定
 		logger.setBaseDir(baseDir.nativePath);
 		logger.setLogLevel(debugMode ? logger.LEVEL_DEBUG : logger.LEVEL_NONE);
+logger.debug(JSON.stringify(tagsForReblog));
 	}
 
 	var checkAuthorized = function() {
@@ -172,6 +183,20 @@ function MainWindow(dashboard, logger) {
 		}
 	}
 
+	var createTagSelectDialog = function() {
+		var opts = {
+				cancel: -1,
+				options: ['タグを指定しない'],
+				selectedIndex: 0,
+				destructive: 0,
+				title: 'リブログ時のタグを選択'
+			};
+		for (var i = 0; i < tagsForReblog.length; i++) {
+			opts['options'].push(tagsForReblog[i]);
+		}
+		return Ti.UI.createOptionDialog(opts);
+	}
+
 	var path = Ti.Filesystem.resourcesDirectory + 'etc/loader.html';
 	var file = Ti.Filesystem.getFile(path);
 	var loaderHtml = file.read().toString();
@@ -246,7 +271,19 @@ function MainWindow(dashboard, logger) {
 							backgroundSelectedImage: '/images/reblog-selected.png',
 						}));
 	reblogButton.addEventListener('click', function() {
-			if (dashboard.reblog()) {
+			if (!tagsForReblog.length || dashboard.totalPin()) {
+				// タグが指定されてなかったりPinが指定されていなかったらそのまま実行
+				dashboard.reblog();
+			}
+			else {
+				var dlg = createTagSelectDialog();
+				dlg.addEventListener('click', function(e) {
+						if (0 <= e.index) {
+							var options = dlg.getOptions();
+							dashboard.reblog(dashboard.currentId(), 0 < e.index ? options[e.index] : '');
+						}
+					});
+				dlg.show();
 			}
 		});
 	toolbar.add(reblogButton);
@@ -290,7 +327,20 @@ function MainWindow(dashboard, logger) {
 							backgroundSelectedImage: '/images/pin-selected.png',
 						}));
 	pinButton.addEventListener('click', function() {
-			dashboard.pin();
+			if (!tagsForReblog.length || dashboard.pinState()) {
+				// タグが指定されてなかったりPinの解除をしようとしていたらそのまま実行
+				dashboard.pin();
+			}
+			else {
+				var dlg = createTagSelectDialog();
+				dlg.addEventListener('click', function(e) {
+						if (0 <= e.index) {
+							var options = dlg.getOptions();
+							dashboard.pin(dashboard.currentId(), 0 < e.index ? options[e.index] : '');
+						}
+					});
+				dlg.show();
+			}
 		});
 	toolbar.add(pinButton);
 

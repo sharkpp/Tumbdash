@@ -364,11 +364,15 @@ self.log.debug('dashboard request failed!');
 		}
 
 		var req = self.reblogQueue[0];
+		var hostname = req['hostname'];
 
 		var options = {
 				id: '' + req['id'],
 				reblog_key: req['reblog_key'],
 			};
+		if (req['tags'] && req['tags'].length) { // タグを追加
+			options['tags'] = req['tags'];
+		}
 
 self.log.debug('reblog start #'+req['id']+' queue:'+self.reblogQueue.length);
 
@@ -389,7 +393,7 @@ self.log.debug('reblog timeout #'+id+' queue:'+self.reblogQueue.length);
 								}
 							}, self.postTimeout);
 
-		tumblr.request(self.apiBaseUrl + 'v2/blog/'+req['hostname']+'/post/reblog',
+		tumblr.request(self.apiBaseUrl + 'v2/blog/'+hostname+'/post/reblog',
 			options, {}, 'POST', function(e) {
 				clearTimeout(idTimeout);
 				if (timeoutAccepted) {
@@ -404,7 +408,9 @@ self.log.debug('reblog suceess "'+e.result.text+'"');
 					if (e.success &&
 						json['meta'] && self.STATUS_CREATED == parseInt(json['meta']['status']))
 					{
-						self.pin(id); // PIN一覧から削除
+						if (self.pinBuffer.length) {
+							self.pin(id); // PIN一覧から削除
+						}
 						setTimeout(function(){ self.fireEvent('reblog', id); }, 1);
 					}
 					else {
@@ -750,8 +756,9 @@ self.log.debug('cache sweep stop '+self.cacheList.length);
 	// PINとして保持されていたらtrueを返す
 	Dashboard.prototype.pinState = function(id) {
 		var self = this;
+		id = id || self.currentId();
 		for (var i = 0, num = self.pinBuffer.length; i < num; i++) {
-			if (id == self.pinBuffer[i]) {
+			if (id == self.pinBuffer[i]['id']) {
 				return true;
 			}
 		}
@@ -759,18 +766,19 @@ self.log.debug('cache sweep stop '+self.cacheList.length);
 	}
 
 	// IDを保持
-	Dashboard.prototype.pin = function(id) {
+	Dashboard.prototype.pin = function(id, tags) {
 		var self = this;
-		id = id || self.currentId();
+		id   = id || self.currentId();
+		tags = tags || '';
 		// すでにバッファに存在する場合は削除
 		for (var i = 0, num = self.pinBuffer.length; i < num; i++) {
-			if (id == self.pinBuffer[i]) {
+			if (id == self.pinBuffer[i]['id']) {
 				self.pinBuffer.splice(i, 1);
 				setTimeout(function(){ self.fireEvent('updatePin', id); }, 1);
 				return;
 			}
 		}
-		self.pinBuffer.push(id);
+		self.pinBuffer.push({ id: id, tags: tags });
 		setTimeout(function(){ self.fireEvent('updatePin', id); }, 1);
 	}
 
@@ -824,20 +832,23 @@ self.log.debug('cache sweep stop '+self.cacheList.length);
 	}
 
 	// IDを指定しリブログ
-	Dashboard.prototype.reblog = function(id) {
+	Dashboard.prototype.reblog = function(id, tags) {
 		var self = this;
-		var idList = [];
+		tags = tags || '';
+		var reblogList = [];
 		if (self.pinBuffer.length) {
-			idList = self.pinBuffer;
+			reblogList = self.pinBuffer;
 		}
 		else {
-			idList.push(id || self.currentId());
+			reblogList.push({ id: id || self.currentId(), tags: tags });
 		}
-		for (var i = 0, id; id = idList[i]; i++) {
+		for (var i = 0, reblogItem; reblogItem = reblogList[i]; i++) {
+			var id = reblogItem['id'];
 			self.reblogQueue.push({
-					id: self.cacheData[id]['id'],
+					id: id,
 					reblog_key: self.cacheData[id]['reblog_key'],
 					hostname: self.blog['hostname'],
+					tags: reblogItem['tags'],
 					retry: 0,
 				});
 		}
@@ -901,7 +912,8 @@ self.log.debug('cache sweep stop '+self.cacheList.length);
 		self.pinBuffer = [];
 		for (var i = 0, num = pinBuffer.length; i < num; i++) {
 			var id = pinBuffer[i]['id'];
-			self.pinBuffer.push(id);
+			var tags = pinBuffer[i]['tags'] || '';
+			self.pinBuffer.push({ id: id, tags: tags });
 		}
 	}
 
@@ -927,14 +939,8 @@ self.log.debug('cache sweep stop '+self.cacheList.length);
 		Ti.App.Properties.setString('lastId', lastId);
 
 		// pinBuffer
-		var pinBuffer = [];
-		for (var i = 0, num = self.pinBuffer.length; i < num; i++) {
-			var id   = self.pinBuffer[i];
-			var post = self.cacheData[id];
-			pinBuffer.push({ id: id });
-		}
 		file = Ti.Filesystem.getFile(self.pinQueuePath);
-		file.write(JSON.stringify(pinBuffer));
+		file.write(JSON.stringify(self.pinBuffer));
 	}
 
 	// キャッシュをクリア
