@@ -348,7 +348,7 @@ logger.debug(JSON.stringify(tagsForReblog));
 							visible: false
 						}));
 	badge.addEventListener('click', function() {
-			dashboard.pin();
+			pinButton.fireEvent('click');
 		});
 	toolbar.add(badge);
 
