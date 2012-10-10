@@ -376,14 +376,26 @@ logger.debug(JSON.stringify(tagsForReblog));
 logger.debug('pause');
 						dashboard.saveCache();
 					});
+				var pinClear;
 				activity.onCreateOptionsMenu = function(e) {
-						menu = e.menu; // save off menu.
+						var menu = e.menu; // save off menu.
 
-						var pinClear = menu.add({ title : 'Pinのクリア' });
+						pinClear = menu.add({ title : 'Pinのクリア' });
 						pinClear.setIcon(Ti.Android.R.drawable.ic_menu_delete);
 						pinClear.addEventListener('click', function(e) {
-								dashboard.pinClear();
-								dashboard.fireEvent('updatePin');
+								var dlg = Ti.UI.createAlertDialog({
+										cancel: 1,
+										message: 'Pinをクリアしますか？',
+										buttonNames: ['はい', 'いいえ'],
+										title: 'Pinのクリア'
+									});
+								dlg.addEventListener('click', function(e){
+										if (e.index !== e.source.cancel){
+											dashboard.pinClear();
+											dashboard.fireEvent('updatePin');
+										}
+									});
+								dlg.show();
 							});
 
 						var menuOption = menu.add({ title : '設定' });
@@ -406,8 +418,11 @@ logger.debug('pause');
 								self.containingTab.open(w, { animated:true });
 							});
 					};
-			/*	activity.onPrepareOptionsMenu = function(e) {
-					};*/
+				activity.onPrepareOptionsMenu = function(e) {
+						var menu = e.menu; // save off menu.
+
+						pinClear.setEnabled( 0 < dashboard.totalPin() );
+					};
 			});
 	}
 
