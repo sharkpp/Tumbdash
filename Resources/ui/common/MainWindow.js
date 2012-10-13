@@ -398,6 +398,20 @@ logger.debug('pause');
 								dlg.show();
 							});
 
+						var menuAbout = menu.add({ title : '移動' });
+						menuAbout.setIcon(Ti.Android.R.drawable.ic_menu_set_as);
+						menuAbout.addEventListener('click', function(e) {
+								var JumpDialog = require('ui/common/JumpDialog');
+								var dlg = JumpDialog.JumpDialog({
+										total: 500,//dashboard.totalPost(),
+										pos: 10,//dashboard.currentPost(),
+									});
+								dlg.addEventListener('click', function(e){
+										alert(e.position);
+									});
+								dlg.show();
+							});
+
 						var menuOption = menu.add({ title : '設定' });
 						menuOption.setIcon(Ti.Android.R.drawable.ic_menu_preferences);
 						menuOption.addEventListener('click', function(e) {
