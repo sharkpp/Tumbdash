@@ -1,4 +1,4 @@
-<?xml version="1.0" ?><manifest android:installLocation="auto" android:versionCode="1" android:versionName="1.0.0" package="net.sharkpp.Tumbdash" xmlns:android="http://schemas.android.com/apk/res/android">
+<?xml version="1.0" ?><manifest android:installLocation="auto" android:versionCode="2" android:versionName="1.1.0" package="net.sharkpp.Tumbdash" xmlns:android="http://schemas.android.com/apk/res/android">
 	<uses-sdk android:minSdkVersion="7"/>
 
 	<!-- TI_MANIFEST -->

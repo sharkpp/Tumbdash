@@ -1,6 +1,19 @@
 # CHANGELOG
 
-最初のリリースです。
+## Ver.1.1.0
+    + ポストの移動機能を実装
+    + リブログ時にタグを指定する機能を実装
+    - 細かな不具合修正
+
+    + Implemented of post jump
+    + Implemented of reblog with tags
+    - Minor bug fix
+
+
+## Ver.1.0.0
+    最初のリリースです。
+
+    First release!
 
 # ISSUE
 
