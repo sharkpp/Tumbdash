@@ -24,12 +24,18 @@ exports.JumpDialog = (function(global){
 		var self = this;
 
 		options = options || {};
-		var total = options['total'] || 0;
-		var pos   = options['pos'] || 0;
+		var cached = options['cached'] || [];
+		var id     = options['id'] || 0;
 
-		self.total    = total;
-		self.position = pos;
-		
+		var position = -1;
+		for (var i = 0, num = cached.length; i < num; i++) {
+			if (id == cached[i]) {
+				position = i;
+			}
+		}
+
+		self.id = 0;
+
 		//determine platform and form factor and render approproate components
 		var osname  = Ti.Platform.osname,
 			version = Ti.Platform.version,
@@ -59,29 +65,42 @@ exports.JumpDialog = (function(global){
 				height: '40%',
 			 });
 
-		var postSliderBase = Ti.UI.createView({
+		var postSliderArea = Ti.UI.createView({
 				backgroundColor: 'gray',
 				left: '0%',
 				top: '0%',
 				width: '100%',
 				height: '49%',
 			});
+		var postSliderBase = Ti.UI.createView({
+				backgroundColor: 'gray',
+				left: '0%',
+				top: '0%',
+				width: '100%',
+				height: '50%',
+			});
 		var postSlider = Ti.UI.createSlider({
 				left: '10dp',
 				right: '10dp',
-				top: '5%',
-				height: '40%',
+				height: '28dp',
 				min: 0,
-				max: total,
-				value: pos,
+				max: cached.length,
+				value: position,
 			});
-		var postIndex = Ti.UI.createTextField({
+	//	var postIndex = Ti.UI.createTextField({
+	//				top: '51%',
+	//				width: '100dp',
+	//				height: '48%',
+	//				valu: '0',
+	//				textAlign: Ti.UI.TEXT_ALIGNMENT_RIGHT,
+	//				keyboardType: Ti.UI.KEYBOARD_DECIMAL_PAD,
+	//		});
+		var postIndex = Ti.UI.createLabel({
 					top: '51%',
 					width: '100dp',
 					height: '48%',
-					valu: '0',
-					textAlign: Ti.UI.TEXT_ALIGNMENT_RIGHT,
-					keyboardType: Ti.UI.KEYBOARD_DECIMAL_PAD,
+					text: '0',
+					textAlign: Ti.UI.TEXT_ALIGNMENT_CENTER,
 			});
 		var cancelButton = Ti.UI.createButton({
 				title: 'キャンセル',
@@ -112,46 +131,47 @@ exports.JumpDialog = (function(global){
 				height: '25%',
 			});
 	
-		postSliderBase.add(postIndex);
+		postSliderArea.add(postIndex);
 		postSliderBase.add(postSlider);
-		view.add(postSliderBase);
+		postSliderArea.add(postSliderBase);
+		view.add(postSliderArea);
 		view.add(cancelButton);
 		view.add(jumpButton);
 		view.add(jumpTopButton);
 		view.add(jumpBottomButton);
 	
 		postSlider.addEventListener('change', function(e){
-//Ti.API.trace('postSlider,change '+postSlider.value+','+postIndex.value+','+e.value);
-				var value = '' + Math.round(e.value + 1);
+				var value = '' + Math.round(e.value + 1) + '/' + postSlider.max;
 				if (value != postIndex.value) {
-					setTimeout(function(){ postIndex.value = value; }, 100);
+				//	setTimeout(function(){ postIndex.value = value; }, 100);
+					setTimeout(function(){ postIndex.text = value; }, 100);
 				}
 			});
-		postIndex.addEventListener('change', function(e){
-//Ti.API.trace('postIndex,change '+postSlider.value+','+postIndex.value+','+e.value);
-				var value = parseInt(e.value);
-				if (value != Math.round(postSlider.value + 1)) {
-//					setTimeout(function(){ postSlider.value = value; }, 100);
-				}
-			});
+//		postIndex.addEventListener('change', function(e){
+//				var value = parseInt(e.value);
+//				if (value != Math.round(postSlider.value + 1)) {
+////					setTimeout(function(){ postSlider.value = value; }, 100);
+//				}
+//			});
 		cancelButton.addEventListener('click', function(){
-				self.position = -1;
+				self.id = 0;
 				self.hide();
 			});
 		jumpButton.addEventListener('click', function(){
-				self.position = Math.round(postSlider.value);
+				var pos = Math.round(postSlider.value);
+				self.id = 0 <= pos && pos < cached.length ? cached[pos] : 0;
 				self.hide();
 			});
 		jumpTopButton.addEventListener('click', function(){
-				self.position = 0;
+				self.id = 0 < cached.length ? cached[0] : 0;
 				self.hide();
 			});
 		jumpBottomButton.addEventListener('click', function(){
-				self.position = self.total - 1;
+				self.id = 0 < cached.length ? cached[cached.length - 1] : 0;
 				self.hide();
 			});
 		self.window.addEventListener('close', function(){
-				self.fireEvent('click', { position: self.position });
+				self.fireEvent('click', { id: self.id });
 			});
 
 		self.window.add(view);

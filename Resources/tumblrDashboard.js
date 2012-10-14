@@ -842,6 +842,16 @@ self.log.debug('cache sweep stop '+self.cacheList.length);
 		return count;
 	}
 
+	// 保持しているキャッシュの一覧を取得
+	Dashboard.prototype.getCachedPostId = function() {
+		var self = this;
+		var list = [];
+		for (var i = 0, num = self.cacheList.length; i < num; i++) {
+			list.push(self.cacheList[i]);
+		}
+		return list;
+	}
+
 	Dashboard.prototype.restCommand = function() {
 		return this.commandQueue.length;
 	}
@@ -854,6 +864,17 @@ self.log.debug('cache sweep stop '+self.cacheList.length);
 	// 現在のPOST位置を取得
 	Dashboard.prototype.currentPost = function() {
 		return this.cacheList.length ? this.cacheIndex + 1 : 0; // もとは0オリジンだけど1オリジンにする
+	}
+
+	// IDから位置を取得
+	Dashboard.prototype.findPost = function(id) {
+		var self = this;
+		for (var i = 0, num = self.cacheList.length; i < num; i++) {
+			if (id == self.cacheList[i]) {
+				return i;
+			}
+		}
+		return -1;
 	}
 
 	// 現在のIDを取得

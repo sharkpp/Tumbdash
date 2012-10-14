@@ -365,7 +365,7 @@ logger.debug(JSON.stringify(tagsForReblog));
 	// メニュー
 
 	var openedPreferences = false;
-	var jumpIndex = -1;
+	var jumpPostid = 0;
 
 	if (isAndroid) {
 		self.addEventListener('open', function(){
@@ -374,8 +374,8 @@ logger.debug(JSON.stringify(tagsForReblog));
 logger.debug('resume');
 						dashboard.loadCache();
 						//
-						if (0 <= jumpIndex) {
-							dashboard.jumpPost(jumpIndex);
+						if (0 < jumpPostid) {
+							dashboard.jumpPost(dashboard.findPost(jumpPostid));
 						}
 					});
 				activity.addEventListener('pause', function() {
@@ -409,12 +409,12 @@ logger.debug('pause');
 						menuAbout.addEventListener('click', function(e) {
 								var JumpDialog = require('ui/common/JumpDialog');
 								var dlg = JumpDialog.JumpDialog({
-										total: dashboard.totalPost(),
-										pos: dashboard.currentPost() - 1,
+										cached: dashboard.getCachedPostId(),
+										id: dashboard.currentId(),
 									});
 								dlg.addEventListener('click', function(e){
 logger.debug(''+e.position);
-										jumpIndex = e.position;
+										jumpPostid = e.id;
 									});
 								dlg.show({ containingTab: self.containingTab });
 							});
@@ -613,6 +613,7 @@ logger.debug('close');
 				progress.value++;
 				if (progress.value == progress.max) {
 					setTimeout(function(){ progress.hide() }, 250);
+					dashboard.saveCache();
 				}
 			}
 		});
