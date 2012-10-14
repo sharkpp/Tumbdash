@@ -42,7 +42,8 @@ exports.JumpDialog = (function(global){
 		var isTablet  = osname === 'ipad' || (isAndroid && (width > 899 || height > 899));
 	
 		var wndOptions = {
-				backgroundColor: '#A000',
+				backgroundColor: 'black',
+				opacity: 0.7,
 			};
 		if (isAndroid) {
 			wndOptions['navBarHidden'] = true;
@@ -156,9 +157,15 @@ exports.JumpDialog = (function(global){
 		self.window.add(view);
 	}
 
-	JumpDialog.prototype.show = function() {
+	JumpDialog.prototype.show = function(options) {
 		var self = this;
-		self.window.open({modal: true});
+		options = options || {};
+		if (options['containingTab']) {
+			options['containingTab'].open(self.window, { animation: false });
+		}
+		else {
+			self.window.open({modal: true});
+		}
 	}
 
 	JumpDialog.prototype.hide = function() {

@@ -416,7 +416,7 @@ logger.debug('pause');
 logger.debug(''+e.position);
 										jumpIndex = e.position;
 									});
-								dlg.show();
+								dlg.show({ containingTab: self.containingTab });
 							});
 
 						var menuOption = menu.add({ title : '設定' });
