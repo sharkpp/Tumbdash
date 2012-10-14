@@ -362,6 +362,7 @@ logger.debug(JSON.stringify(tagsForReblog));
 				activity.addEventListener('resume', function() {
 logger.debug('resume');
 						dashboard.loadCache();
+						dashboard.reloadCache();
 						//
 						if (0 < jumpPostid) {
 							dashboard.jumpPost(dashboard.findPost(jumpPostid));

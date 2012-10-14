@@ -582,9 +582,10 @@ self.log.debug('reblog suceess "'+e.result.text+'"');
 	}
 
 	function runJumpPost(data) {
-		var self  = this;
-		var index = typeof data['index'] == 'undefined' ? -1 : data['index'];
-self.log.debug('jump to #1 '+index+' ('+self.cacheIndex+','+self.cacheList.length+')');
+		var self   = this;
+		var index  = typeof data['index'] == 'undefined' ? -1 : data['index'];
+		var reverse= typeof data['reverse'] != 'undefined';
+self.log.debug('jump to #1 '+index+','+reverse+' ('+self.cacheIndex+','+self.cacheList.length+')');
 		if (index < 0 || self.cacheList.length <= index) {
 			return false;
 		}
@@ -592,6 +593,7 @@ self.log.debug('jump to #1 '+index+' ('+self.cacheIndex+','+self.cacheList.lengt
 			return true;
 		}
 		var direction = index < self.cacheIndex ? -1 : 1;
+		    direction = reverse ? -direction : direction; // 向きを反転
 		// 自分のポスト or 自分からのリブログ の場合内容をチェックする
 		if (self.hideEnable) {
 			var result = searchPost.call(self, {
@@ -606,7 +608,14 @@ self.log.debug('jump to #2 '+result.success+','+result.index);
 						]); }, 10);
 				}
 				else {
-					setTimeout(function(){ self.fireEvent('loadComplite', self.post()); }, 1);
+					if (!reverse) {
+						setTimeout(function(){ fetchCommand.call(self, [
+								{ type: self.CMD_JUMP_POST, index: result.index < 0 ? 0 : self.cacheList.length - 1, reverse: true },
+							]); }, 10);
+					}
+					else {
+						setTimeout(function(){ self.fireEvent('loadComplite', self.post()); }, 1);
+					}
 				}
 				return false;
 			}
@@ -946,6 +955,12 @@ self.log.debug('cache sweep stop '+self.cacheList.length);
 					type: this.CMD_JUMP_POST,
 					index: index,
 				});
+	}
+
+	// 
+	Dashboard.prototype.reloadCache = function(index) {
+		var self = this;
+		requestCachedPosts.call(self, self.currentId());
 	}
 
 	// キャッシュを読み込み

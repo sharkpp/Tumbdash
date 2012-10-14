@@ -15,17 +15,17 @@ module.exports = (function() {
 			},
 		'post-slider-base': {
 				left: '0%',
-				top: '0%',
+				top: '24dp',
 				width: '100%',
-				height: '40dp',			
+				height: '40dp',
 			},
 		'post-index': {
 //				top: '51%',
 //				width: '100dp',
 //				height: '48%',
-				top: '42dp',
+				top: '4dp',
 				width: '100dp',
-				height: '26dp',
+				height: '20dp',
 			},
 		'post-slider': {
 				left: '10dp',
