@@ -12,30 +12,9 @@ function MainWindow(dashboard, logger) {
 	var isAndroid = osname === 'android';
 	var isTablet  = osname === 'ipad' || (isAndroid && (width > 899 || height > 899));
 
-	var getProperties = function(id, mergeProperties) {
-		mergeProperties = mergeProperties || {};
-		var lookupProperties = {};
-		if (isTablet) {
-			lookupProperties = require('ui/tablet/MainWindow').MainWindow()[id];
-		}
-		else {
-			// Android uses platform-specific properties to create windows.
-			// All other platforms follow a similar UI pattern.
-			if (osname === 'android') {
-				lookupProperties = require('ui/handheld/android/MainWindow').MainWindow()[id];
-			}
-			else {
-				lookupProperties = require('ui/handheld/MainWindow').MainWindow()[id];
-			}
-		}
-	//	lookupProperties = lookupProperties || {};
-		for (key in mergeProperties) {
-			lookupProperties[key] = mergeProperties[key];
-		}
-		return lookupProperties;
-	}
-
-	//
+	// レイアウト適用モジュールを読み込み
+	var UiLayouter = require('UiLayouter');
+	var layout;
 
 	var cacheLoaded = false;
 
@@ -161,7 +140,8 @@ logger.debug(JSON.stringify(tagsForReblog));
 			}
 		}
 		var button      = Ti.UI.createView(params);
-		var buttonInner = Ti.UI.createLabel(getProperties('toolbar-button-inner', innerParams));
+		var buttonInner = Ti.UI.createLabel(innerParams);
+		layout.addItem('toolbar-button-inner', buttonInner);
 		button.add(buttonInner);
 		buttonInner.addEventListener('touchstart', function(e) {
 				button.backgroundColor = button.backgroundSelectedColor;
@@ -169,10 +149,6 @@ logger.debug(JSON.stringify(tagsForReblog));
 		buttonInner.addEventListener('touchend', function(e) {
 				button.backgroundColor = '#0000';
 			});
-	//	button.addEventListener('touchmove', function(e) {
-	//			if (e.x e.x e.y)
-	//			buttonInner.backgroundColor = button.backgroundColor;
-	//		});
 		return button;
 	}
 
@@ -216,31 +192,37 @@ logger.debug(JSON.stringify(tagsForReblog));
 	var self = Ti.UI.createWindow(wndOptions);
 	var view = Ti.UI.createView();
 
+	layout = new UiLayouter('MainWindow');
+
 	// 各UIを初期化
 
 	// ビュー
 
-	var webview = Ti.UI.createWebView(getProperties('webview'));
+	var webview = Ti.UI.createWebView();
 	webview.html = dashboard.authorized() ? loaderHtml : '';
+	layout.addItem('webview', webview);
 	view.add(webview);
 
-	var status = Ti.UI.createLabel(getProperties('status', {
+	var status = Ti.UI.createLabel({
 							visible: false,
 							touchEnabled: false,
-						}));
+						});
+	layout.addItem('status', status);
 	view.add(status);
 
-	var pinStatus = Ti.UI.createLabel(getProperties('pin-status', {
+	var pinStatus = Ti.UI.createLabel({
 							visible: false,
 							backgroundImage: '/images/pin.png',
-						}));
+						});
+	layout.addItem('pin-status', pinStatus);
 	view.add(pinStatus);
 
-	var debugConsole = Ti.UI.createTextArea(getProperties('console', {
+	var debugConsole = Ti.UI.createTextArea({
 							visible: false,
 							touchEnabled: false,
 							editable: false,
-						}));
+						});
+	layout.addItem('console', debugConsole);
 	debugConsole.visible = true;
 	debugConsole.addEventListener('click', function() {
 			debugConsole.visible = false;
@@ -250,26 +232,29 @@ logger.debug(JSON.stringify(tagsForReblog));
 
 	// ツールバー
 
-	var toolbar = Ti.UI.createView(getProperties('toolbar'));
+	var toolbar = Ti.UI.createView();
+	layout.addItem('toolbar', toolbar);
 
-	var likeButton = createToolbarButton(getProperties('toolbar-like-button', {
+	var likeButton = createToolbarButton({
 							enabled: false,
 							backgroundImage:         '/images/like.png',
 							backgroundDisabledImage: '/images/like-disabled.png',
 							backgroundSelectedImage: '/images/like-selected.png',
-						}));
+						});
+	layout.addItem('toolbar-like-button', likeButton);
 	likeButton.addEventListener('click', function() {
 			if (dashboard.like()) {
 			}
 		});
 	toolbar.add(likeButton);
 
-	var reblogButton = createToolbarButton(getProperties('toolbar-reblog-button', {
+	var reblogButton = createToolbarButton({
 							enabled: false,
 							backgroundImage:         '/images/reblog.png',
 							backgroundDisabledImage: '/images/reblog-disabled.png',
 							backgroundSelectedImage: '/images/reblog-selected.png',
-						}));
+						});
+	layout.addItem('toolbar-reblog-button', reblogButton);
 	reblogButton.addEventListener('click', function() {
 			if (!tagsForReblog.length || dashboard.totalPin()) {
 				// タグが指定されてなかったりPinが指定されていなかったらそのまま実行
@@ -288,12 +273,13 @@ logger.debug(JSON.stringify(tagsForReblog));
 		});
 	toolbar.add(reblogButton);
 
-	var prevButton = createToolbarButton(getProperties('toolbar-prev-button', {
+	var prevButton = createToolbarButton({
 							enabled: false,
 							backgroundImage:         '/images/prev.png',
 							backgroundDisabledImage: '/images/prev-disabled.png',
 							backgroundSelectedImage: '/images/prev-selected.png',
-						}));
+						});
+	layout.addItem('toolbar-prev-button', prevButton);
 	prevButton.addEventListener('click', function() {
 			if (dashboard.prevPost()) {
 				enableToolbarButton(prevButton, false);
@@ -304,12 +290,13 @@ logger.debug(JSON.stringify(tagsForReblog));
 		});
 	toolbar.add(prevButton);
 
-	var nextButton = createToolbarButton(getProperties('toolbar-next-button', {
+	var nextButton = createToolbarButton({
 							enabled: false,
 							backgroundImage:         '/images/next.png',
 							backgroundDisabledImage: '/images/next-disabled.png',
 							backgroundSelectedImage: '/images/next-selected.png',
-						}));
+						});
+	layout.addItem('toolbar-next-button', nextButton);
 	nextButton.addEventListener('click', function() {
 			if (dashboard.nextPost()) {
 				enableToolbarButton(prevButton, false);
@@ -320,12 +307,13 @@ logger.debug(JSON.stringify(tagsForReblog));
 		});
 	toolbar.add(nextButton);
 
-	var pinButton = createToolbarButton(getProperties('toolbar-pin-button', {
+	var pinButton = createToolbarButton({
 							enabled: false,
 							backgroundImage:         '/images/pin.png',
 							backgroundDisabledImage: '/images/pin-disabled.png',
 							backgroundSelectedImage: '/images/pin-selected.png',
-						}));
+						});
+	layout.addItem('toolbar-pin-button', pinButton);
 	pinButton.addEventListener('click', function() {
 			if (!tagsForReblog.length || dashboard.pinState()) {
 				// タグが指定されてなかったりPinの解除をしようとしていたらそのまま実行
@@ -344,9 +332,10 @@ logger.debug(JSON.stringify(tagsForReblog));
 		});
 	toolbar.add(pinButton);
 
-	var badge = Ti.UI.createLabel(getProperties('toolbar-pin-badge', {
+	var badge = Ti.UI.createLabel({
 							visible: false
-						}));
+						});
+	layout.addItem('toolbar-pin-badge', badge);
 	badge.addEventListener('click', function() {
 			pinButton.fireEvent('click');
 		});

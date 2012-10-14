@@ -1,5 +1,5 @@
 //MainWindow Component Constructor
-exports.MainWindow = function() {
+module.exports = function() {
 	return {
 			'webview': {
 					backgroundColor: '#fff',
