@@ -1,1 +1,9 @@
 tmp
+
+.DS_Store
+
+Resources/key.js
+
+build.log
+
+build/
