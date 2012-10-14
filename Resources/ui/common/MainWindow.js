@@ -365,12 +365,18 @@ logger.debug(JSON.stringify(tagsForReblog));
 	// メニュー
 
 	var openedPreferences = false;
+	var jumpIndex = -1;
 
 	if (isAndroid) {
 		self.addEventListener('open', function(){
 				var activity = self.activity; // openの後でないと取得できない
 				activity.addEventListener('resume', function() {
+logger.debug('resume');
 						dashboard.loadCache();
+						//
+						if (0 <= jumpIndex) {
+							dashboard.jumpPost(jumpIndex);
+						}
 					});
 				activity.addEventListener('pause', function() {
 logger.debug('pause');
@@ -403,11 +409,12 @@ logger.debug('pause');
 						menuAbout.addEventListener('click', function(e) {
 								var JumpDialog = require('ui/common/JumpDialog');
 								var dlg = JumpDialog.JumpDialog({
-										total: 500,//dashboard.totalPost(),
-										pos: 10,//dashboard.currentPost(),
+										total: dashboard.totalPost(),
+										pos: dashboard.currentPost() - 1,
 									});
 								dlg.addEventListener('click', function(e){
-										alert(e.position);
+logger.debug(''+e.position);
+										jumpIndex = e.position;
 									});
 								dlg.show();
 							});

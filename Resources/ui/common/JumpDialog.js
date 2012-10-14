@@ -121,7 +121,7 @@ exports.JumpDialog = (function(global){
 	
 		postSlider.addEventListener('change', function(e){
 //Ti.API.trace('postSlider,change '+postSlider.value+','+postIndex.value+','+e.value);
-				var value = '' + Math.round(e.value);
+				var value = '' + Math.round(e.value + 1);
 				if (value != postIndex.value) {
 					setTimeout(function(){ postIndex.value = value; }, 100);
 				}
@@ -129,12 +129,12 @@ exports.JumpDialog = (function(global){
 		postIndex.addEventListener('change', function(e){
 //Ti.API.trace('postIndex,change '+postSlider.value+','+postIndex.value+','+e.value);
 				var value = parseInt(e.value);
-				if (value != Math.round(postSlider.value)) {
+				if (value != Math.round(postSlider.value + 1)) {
 //					setTimeout(function(){ postSlider.value = value; }, 100);
 				}
 			});
 		cancelButton.addEventListener('click', function(){
-				self.postition = -1;
+				self.position = -1;
 				self.hide();
 			});
 		jumpButton.addEventListener('click', function(){
@@ -142,14 +142,17 @@ exports.JumpDialog = (function(global){
 				self.hide();
 			});
 		jumpTopButton.addEventListener('click', function(){
-				self.postition = 0;
+				self.position = 0;
 				self.hide();
 			});
 		jumpBottomButton.addEventListener('click', function(){
-				self.postition = self.total - 1;
+				self.position = self.total - 1;
 				self.hide();
 			});
-	
+		self.window.addEventListener('close', function(){
+				self.fireEvent('click', { position: self.position });
+			});
+
 		self.window.add(view);
 	}
 
@@ -161,7 +164,6 @@ exports.JumpDialog = (function(global){
 	JumpDialog.prototype.hide = function() {
 		var self = this;
 		self.window.close();
-		self.fireEvent('click', { position: self.position });
 	}
 
 	// イベントリスナーの登録

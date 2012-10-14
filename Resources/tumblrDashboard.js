@@ -107,8 +107,9 @@ self.log.debug('login suceess');
 
 	Dashboard.prototype.CMD_PREV_POST       = 0; // 前のPOSTを取得
 	Dashboard.prototype.CMD_NEXT_POST       = 1; // 次のPOSTを取得
-	Dashboard.prototype.CMD_REQ_FUTURE_POST = 2; // 
-	Dashboard.prototype.CMD_SWEEP_POST      = 3; // 
+	Dashboard.prototype.CMD_JUMP_POST       = 2; // 指定のPOSTに移動
+	Dashboard.prototype.CMD_REQ_FUTURE_POST = 3; // 
+	Dashboard.prototype.CMD_SWEEP_POST      = 4; // 
 
 	function updateBlogsInfo(blogs) {
 		var self   = this;
@@ -580,6 +581,52 @@ self.log.debug('reblog suceess "'+e.result.text+'"');
 		return true;
 	}
 
+	function runJumpPost(data) {
+		var self  = this;
+		var index = typeof data['index'] == 'undefined' ? -1 : data['index'];
+self.log.debug('jump to #1 '+index+' ('+self.cacheIndex+','+self.cacheList.length+')');
+		if (index < 0 || self.cacheList.length <= index) {
+			return false;
+		}
+		if (index == self.cacheIndex) {
+			return true;
+		}
+		var direction = index < self.cacheIndex ? -1 : 1;
+		// 自分のポスト or 自分からのリブログ の場合内容をチェックする
+		if (self.hideEnable) {
+			var result = searchPost.call(self, {
+					direction: direction,
+					pos: index,
+				});
+self.log.debug('jump to #2 '+result.success+','+result.index);
+			if (!result.success) {
+				if (0 <= result.index && result.index < self.cacheList.length) {
+					setTimeout(function(){ fetchCommand.call(self, [
+							{ type: self.CMD_JUMP_POST, index: result.index },
+						]); }, 10);
+				}
+				else {
+					setTimeout(function(){ self.fireEvent('loadComplite', self.post()); }, 1);
+				}
+				return false;
+			}
+			index = result.index;
+		}
+self.log.debug('jump to #3 '+index+' ('+self.cacheIndex+','+self.cacheList.length+')'+self.currentId());
+		self.cacheIndex = index;
+self.log.debug('jump to #4 '+index+' ('+self.cacheIndex+','+self.cacheList.length+')'+self.currentId());
+		//
+		if (isEmptyCachedPost.call(self, self.currentId())) {
+			setTimeout(function(){ self.fireEvent('loading', self.currentId()); }, 1);
+			requestCachedPosts.call(self, self.currentId());
+		}
+		else {
+			setTimeout(function(){ self.fireEvent('loadComplite', self.post()); }, 1);
+		}
+		setTimeout(function(){ fetchCommand.call(self); }, 10);
+		return true;
+	}
+
 	function runReqFuturePost(data) {
 		var self = this;
 		requestFuturePosts.call(self);
@@ -684,7 +731,7 @@ self.log.debug('cache sweep stop '+self.cacheList.length);
 						break;
 					}
 				}
-				// 前のPOSTや次のPOSTに移動の場合は重複処理を行う
+				// 前のPOSTや次のPOSTに移動の場合は重複チェック処理を行う
 				if (!conflict ||
 					!(self.CMD_PREV_POST == type ||
 					  self.CMD_NEXT_POST == type)) {
@@ -701,7 +748,8 @@ self.log.debug('cache sweep stop '+self.cacheList.length);
 		{
 		case self.CMD_PREV_POST: runPrevPost.call(self, newCommand); return true;
 		case self.CMD_NEXT_POST: runNextPost.call(self, newCommand); return true;
-		case self.CMD_REQ_FUTURE_POST: runReqFuturePost.call(self); return true;
+		case self.CMD_JUMP_POST: runJumpPost.call(self, newCommand); return true;
+		case self.CMD_REQ_FUTURE_POST: runReqFuturePost.call(self);  return true;
 		case self.CMD_SWEEP_POST: runSweepPost.call(self); return true;
 		}
 		return true;
@@ -868,6 +916,14 @@ self.log.debug('cache sweep stop '+self.cacheList.length);
 	Dashboard.prototype.nextPost = function() {
 		return fetchCommand.call(this, {
 					type: this.CMD_NEXT_POST
+				});
+	}
+
+	// 指定のPOSTに移動
+	Dashboard.prototype.jumpPost = function(index) {
+		return fetchCommand.call(this, {
+					type: this.CMD_JUMP_POST,
+					index: index,
 				});
 	}
 
