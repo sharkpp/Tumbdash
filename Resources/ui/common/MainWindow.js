@@ -365,7 +365,9 @@ logger.debug('resume');
 						dashboard.reloadCache();
 						//
 						if (0 < jumpPostid) {
-							dashboard.jumpPost(dashboard.findPost(jumpPostid));
+							var index = dashboard.findPost(jumpPostid);
+							jumpPostid = 0;
+							dashboard.jumpPost(index);
 						}
 					});
 				activity.addEventListener('pause', function() {
