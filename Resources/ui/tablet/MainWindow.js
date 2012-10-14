@@ -1,5 +1,5 @@
 //MainWindow Component Constructor
-module.exports = function() {
+module.exports = (function() {
 	return {
 			'webview': {
 					backgroundColor: '#fff',
@@ -99,4 +99,4 @@ module.exports = function() {
 					textAlign: 'center',
 				}
 		};
-}
+})();

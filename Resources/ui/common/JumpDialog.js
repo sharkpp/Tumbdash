@@ -36,16 +36,11 @@ exports.JumpDialog = (function(global){
 
 		self.id = 0;
 
-		//determine platform and form factor and render approproate components
-		var osname  = Ti.Platform.osname,
-			version = Ti.Platform.version,
-			height  = Ti.Platform.displayCaps.platformHeight,
-			width   = Ti.Platform.displayCaps.platformWidth;
-	
-		//considering tablet to have one dimension over 900px - this is imperfect, so you should feel free to decide
-		//yourself what you consider a tablet form factor for android
-		var isAndroid = osname === 'android';
-		var isTablet  = osname === 'ipad' || (isAndroid && (width > 899 || height > 899));
+		// レイアウト適用モジュールを読み込み
+		var UiLayouter = require('UiLayouter');
+		var layout;
+
+		var isAndroid = Ti.Platform.osname === 'android';
 	
 		var wndOptions = {
 				backgroundColor: 'black',
@@ -56,89 +51,62 @@ exports.JumpDialog = (function(global){
 		}
 	
 		self.window = Ti.UI.createWindow(wndOptions);
-	
+		layout = new UiLayouter('JumpDialog');
+
 		var view = Ti.UI.createView({ 
-				backgroundColor: '#fff',
-				borderRadius: 10,
-				borderWidth: 3,
-				width: '80%',
-				height: '40%',
+				backgroundColor: 'lightgray',
+				borderColor: 'white',
 			 });
 
 		var postSliderArea = Ti.UI.createView({
 				backgroundColor: 'gray',
-				left: '0%',
-				top: '0%',
-				width: '100%',
-				height: '49%',
 			});
 		var postSliderBase = Ti.UI.createView({
 				backgroundColor: 'gray',
-				left: '0%',
-				top: '0%',
-				width: '100%',
-				height: '50%',
 			});
 		var postSlider = Ti.UI.createSlider({
-				left: '10dp',
-				right: '10dp',
-				height: '28dp',
 				min: 0,
 				max: cached.length,
 				value: position,
 			});
 	//	var postIndex = Ti.UI.createTextField({
-	//				top: '51%',
-	//				width: '100dp',
-	//				height: '48%',
 	//				valu: '0',
 	//				textAlign: Ti.UI.TEXT_ALIGNMENT_RIGHT,
 	//				keyboardType: Ti.UI.KEYBOARD_DECIMAL_PAD,
 	//		});
 		var postIndex = Ti.UI.createLabel({
-					top: '51%',
-					width: '100dp',
-					height: '48%',
 					text: '0',
 					textAlign: Ti.UI.TEXT_ALIGNMENT_CENTER,
 			});
-		var cancelButton = Ti.UI.createButton({
-				title: 'キャンセル',
-				left: '0%',
-				top: '75%',
-				width: '100%',
-				height: '25%',
+
+		var buttonArea = Ti.UI.createView({
+				backgroundColor: 'lightgray',
 			});
-		var jumpButton = Ti.UI.createButton({
-				title: '移動',
-				left: '35%',
-				top: '50%',
-				width: '30%',
-				height: '25%',
-			});
-		var jumpTopButton = Ti.UI.createButton({
-				title: '先頭に移動',
-				left: '0%',
-				top: '50%',
-				width: '35%',
-				height: '25%',
-			});
-		var jumpBottomButton = Ti.UI.createButton({
-				title: '末尾に移動',
-				left: '65%',
-				top: '50%',
-				width: '35%',
-				height: '25%',
-			});
+		var cancelButton = Ti.UI.createButton({ title: 'キャンセル' });
+		var jumpButton = Ti.UI.createButton({ title: '移動' });
+		var jumpTopButton = Ti.UI.createButton({ title: '先頭に移動' });
+		var jumpBottomButton = Ti.UI.createButton({ title: '末尾に移動' });
+
+		layout.addItem('view', view);
+		layout.addItem('post-slider-area', postSliderArea);
+		layout.addItem('post-slider-base', postSliderBase);
+		layout.addItem('post-index', postIndex);
+		layout.addItem('post-slider', postSlider);
+		layout.addItem('button-area', buttonArea);
+		layout.addItem('cancel', cancelButton);
+		layout.addItem('jump', jumpButton);
+		layout.addItem('jump-top', jumpTopButton);
+		layout.addItem('jump-bottom', jumpBottomButton);
 	
 		postSliderArea.add(postIndex);
 		postSliderBase.add(postSlider);
 		postSliderArea.add(postSliderBase);
 		view.add(postSliderArea);
-		view.add(cancelButton);
-		view.add(jumpButton);
-		view.add(jumpTopButton);
-		view.add(jumpBottomButton);
+		buttonArea.add(cancelButton);
+		buttonArea.add(jumpButton);
+		buttonArea.add(jumpTopButton);
+		buttonArea.add(jumpBottomButton);
+		view.add(buttonArea);
 
 		postSlider.addEventListener('change', function(e){
 				var value = '' + Math.round(e.value + 1) + '/' + postSlider.max;

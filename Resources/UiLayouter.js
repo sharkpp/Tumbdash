@@ -54,7 +54,7 @@ module.exports = (function(global){
 		var dirname = 'ui/';
 
 		if (isTablet) {
-			dirname += 'handheld/';
+			dirname += 'tablet/';
 		}
 		else {
 			if (osname === 'android') {
@@ -69,6 +69,15 @@ module.exports = (function(global){
 		//   for both orientation -> {layoutName}.js
 		//   for portrait         -> {layoutName}-port.js
 		//   for landscape        -> {layoutName}-land.js
+		// ファイル内容
+		//   >module.exports = (function() {
+		//   >  return {
+		//   >    'foo': { // itemName
+		//   >      hoge: 'huga', // item property
+		//   >       :            //       :
+		//   >    }
+		//   >  };
+		//   >})();
 
 		var basename = dirname + self.layoutName;
 
