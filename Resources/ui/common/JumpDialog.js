@@ -139,7 +139,7 @@ exports.JumpDialog = (function(global){
 		view.add(jumpButton);
 		view.add(jumpTopButton);
 		view.add(jumpBottomButton);
-	
+
 		postSlider.addEventListener('change', function(e){
 				var value = '' + Math.round(e.value + 1) + '/' + postSlider.max;
 				if (value != postIndex.value) {
@@ -175,6 +175,8 @@ exports.JumpDialog = (function(global){
 			});
 
 		self.window.add(view);
+
+		postSlider.fireEvent('change', { value: postSlider.value });
 	}
 
 	JumpDialog.prototype.show = function(options) {
