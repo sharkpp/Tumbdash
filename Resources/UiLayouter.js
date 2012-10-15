@@ -85,14 +85,13 @@ module.exports = (function(global){
 
 		var layout;
 		var file;
-		
-		file = Ti.Filesystem.getFile(basename + '.js');
-		if (file.exists()) {
+
+		try {
 			// {layoutName}.js
 			layout = require(basename);
 			self.noOrientationLayout = true;
 		}
-		else {
+		catch(e) {
 			// {layoutName}-port.js or {layoutName}-land.js
 			layout = require(basename + '-' + orientation);
 		}

@@ -10,7 +10,7 @@
     <sdk-version>2.1.3.GA</sdk-version>
     <id>net.sharkpp.Tumbdash</id>
     <name>Tumbdash</name>
-    <version>1.1.0</version>
+    <version>1.1.1</version>
     <publisher>sharkpp</publisher>
     <url>http://</url>
     <description>Tumblr™ client for Reblog Monkey's.</description>
@@ -25,6 +25,7 @@
     <analytics>true</analytics>
     <guid>9de47c2c-5983-44e9-9777-e1e958f51198</guid>
     <property name="ti.ui.defaultunit">system</property>
+    <property name="ti.android.bug2373.finishfalseroot" type="bool">true</property>
     <iphone>
         <orientations device="iphone">
             <orientation>Ti.UI.PORTRAIT</orientation>
@@ -38,7 +39,7 @@
     </iphone>
     <android xmlns:android="http://schemas.android.com/apk/res/android">
         <tool-api-level>8</tool-api-level>
-        <manifest android:versionCode="2" android:versionName="1.1.0" android:installLocation="auto">
+        <manifest android:versionCode="3" android:versionName="1.1.1" android:installLocation="auto">
             <uses-sdk android:minSdkVersion="7" />
             <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
             <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
