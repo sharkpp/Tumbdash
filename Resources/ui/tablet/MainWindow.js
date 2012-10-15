@@ -37,7 +37,6 @@ module.exports = (function() {
 					color : '#fff',
 					backgroundSelectedColor: '#0000',
 					textAlign: 'left',
-					textAlign: 'left',
 				},
 			'toolbar': {
 					height: '48dp',
