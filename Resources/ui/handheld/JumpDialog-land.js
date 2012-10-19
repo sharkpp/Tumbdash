@@ -4,8 +4,8 @@ module.exports = (function() {
 		'view': {
 				borderRadius: 10,
 				borderWidth: 3,
-				width: '60%',
-				height: '70%',
+				width: '250dp',
+				height: '200dp',
 			},
 		'post-slider-area': {
 				left: '0%',

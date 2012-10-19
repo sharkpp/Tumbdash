@@ -244,6 +244,8 @@ self.log.debug('login suceess');
 		self.requesting = true;
 
 		var options = self.requestQue[0];
+		
+		options['reblog_info'] = true;
 
 		tumblr.request(self.apiBaseUrl + 'v2/user/dashboard', options, {}, 'POST', function(e) {
 				self.state      = self.STATE_IDLE;
