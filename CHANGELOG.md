@@ -1,6 +1,11 @@
 # CHANGELOG
 
 
+## Ver.1.1.2
+    - ポストの移動ダイアログのレイアウトを調整
+
+    - Adjust the layout of the "jump post dialog"
+
 ## Ver.1.1.1
     - 起動時のRuntime errorを修正
     - "An application restart is required" メッセージが不必要に出ないように修正
