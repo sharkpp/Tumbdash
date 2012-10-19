@@ -20,17 +20,39 @@ module.exports = (function(global){
 		}
 
 		self.layoutName = layoutName;
+//		self.window     = w;
 		self.items      = {};
 		self.noOrientationLayout = false;
+//		self.relayoutWhenWindowOpen = false;
 
 		Ti.Gesture.addEventListener('orientationchange', function(e){
 				applyLayout.call(self);
 			});
 
+//		if (self.window) {
+//			self.window.addEventListener('open', function(){
+//					reLayout.call(self);
+//				});
+//		}
+
 		applyLayout.call(self);
 	};
 
 	K.prototype = UiLayouter.prototype;
+
+//	function reLayout() {
+//		var self = this;
+//		if (self.relayoutWhenWindowOpen) {
+//			if (!self.window.size.height) {
+//				setTimeout(function(){
+//						reLayout.call(self);
+//					}, 1);
+//			}
+//			else {
+//				applyLayout.call(self);
+//			}
+//		}
+//	}
 
 	// レイアウトを適用
 	function applyLayout() {
@@ -111,7 +133,34 @@ module.exports = (function(global){
 		if (self.items[itemName]) {
 			var item = self.items[itemName];
 			for (key in itemLayout) {
-				item[key] = itemLayout[key]
+//				if ('minWidth' === key || 'minHeight' === key) {
+//					continue;
+//				}
+				item[key] = itemLayout[key];
+//				if ('width' === key && itemLayout.hasOwnProperty('minWidth')) {
+//					if (!item.size.width) {
+//						self.relayoutWhenWindowOpen = true;
+//					}
+//					else {
+//						var width = item.size.width;
+//						item[key] = itemLayout['minWidth'];
+//						if (item.size.width <= width) {
+//							item[key] = itemLayout[key];
+//						}
+//					}
+//				}
+//				else if ('height' === key && itemLayout.hasOwnProperty('minHeight')) {
+//					if (!item.size.height) {
+//						self.relayoutWhenWindowOpen = true;
+//					}
+//					else {
+//						var height = item.size.height;
+//						item[key] = itemLayout['minHeight'];
+//						if (item.size.height <= height) {
+//							item[key] = itemLayout[key];
+//						}
+//					}
+//				}
 			}
 		}
 	}
