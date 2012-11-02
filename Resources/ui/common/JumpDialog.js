@@ -1,7 +1,6 @@
 //JumpDialog Component Constructor
 
-var exports = exports || this;
-exports.JumpDialog = (function(global){
+module.exports = (function(global){
 	var K = function(){};
 
 	var JumpDialog = function(options) {

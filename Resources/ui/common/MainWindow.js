@@ -315,20 +315,26 @@ logger.debug(JSON.stringify(tagsForReblog));
 						});
 	layout.addItem('toolbar-pin-button', pinButton);
 	pinButton.addEventListener('click', function() {
-			if (!tagsForReblog.length || dashboard.pinState()) {
-				// タグが指定されてなかったりPinの解除をしようとしていたらそのまま実行
-				dashboard.pin();
-			}
-			else {
-				var dlg = createTagSelectDialog();
-				dlg.addEventListener('click', function(e) {
-						if (0 <= e.index) {
-							var options = dlg.getOptions();
-							dashboard.pin(dashboard.currentId(), 0 < e.index ? options[e.index] : '');
-						}
-					});
-				dlg.show();
-			}
+		//	if (!tagsForReblog.length || dashboard.pinState()) {
+		//		// タグが指定されてなかったりPinの解除をしようとしていたらそのまま実行
+		//		dashboard.pin();
+		//	}
+		//	else {
+		//		var dlg = createTagSelectDialog();
+		//		dlg.addEventListener('click', function(e) {
+		//				if (0 <= e.index) {
+		//					var options = dlg.getOptions();
+		//					dashboard.pin(dashboard.currentId(), 0 < e.index ? options[e.index] : '');
+		//				}
+		//			});
+		//		dlg.show();
+		//	}
+			var PinDialog = require('ui/common/PinDialog');
+			var dlg = new PinDialog({
+				});
+			dlg.addEventListener('click', function(e){
+				});
+			dlg.show({ containingTab: self.containingTab });
 		});
 	toolbar.add(pinButton);
 
@@ -400,7 +406,7 @@ logger.debug('pause');
 						menuAbout.setIcon(Ti.Android.R.drawable.ic_menu_set_as);
 						menuAbout.addEventListener('click', function(e) {
 								var JumpDialog = require('ui/common/JumpDialog');
-								var dlg = JumpDialog.JumpDialog({
+								var dlg = new JumpDialog({
 										cached: dashboard.getCachedPostId(),
 										id: dashboard.currentId(),
 									});
