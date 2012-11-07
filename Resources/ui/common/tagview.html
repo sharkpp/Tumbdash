@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=no;" />
+<script>
+function onTagClicked() {
+	Ti.App.fireEvent('onTagClicked', {value: this.innerHTML});
+}
+function updateTags(tags) {
+	var body = document.body;
+	while (body.firstChild) {
+		body.removeChild(body.firstChild);
+	}
+	for (var i = 0, tag; tag = tags[i]; ++i) {
+		var item = document.createElement('div');
+		item.className = 'tag';
+		item.innerHTML = tag;
+		item.onclick = onTagClicked;
+		body.appendChild(item);
+	}
+}
+function toggleTags(tags) {
+	var body = document.body;
+	for (var i = 0, tag; tag = tags[i]; i++) {
+		for (var elm = body.firstChild; elm; elm = elm.nextSibling) {
+			if (tag == elm.innerHTML) {
+				if (0 <= elm.className.indexOf('selected')) {
+					elm.className = 'tag';
+				}
+				else {
+					elm.className = 'tag selected';
+				}
+			}
+		}
+	}
+}
+</script>
+<style type="text/css">
+body, html {
+	padding: 0;
+}
+.tag {
+	margin: 2px;
+	padding: 10px;
+	background-color: #aaa;
+	word-break: keep-all;
+	word-wrap: normal;
+	float: left;
+	border-radius: 3px;
+}
+.selected {
+	background-color: #afa;
+}
+</style>
+</head>
+<body>
+</body>
+</html>

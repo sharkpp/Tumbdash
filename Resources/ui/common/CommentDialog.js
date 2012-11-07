@@ -31,6 +31,7 @@ module.exports = (function(global){
 		self._top    = options['top']    || '';
 		self._right  = options['right']  || '';
 		self._bottom = options['bottom'] || '';
+		self.cancel  = options['cancel'] || -1;
 
 		var isAndroid = Ti.Platform.osname === 'android';
 	
@@ -50,6 +51,17 @@ module.exports = (function(global){
 width: '240dp',
 height: '200dp',
 			 });
+
+		var titleLabel = Ti.UI.createLabel({ 
+				backgroundColor: 'gray',
+				color: 'white',
+width: '100%',
+height: '40dp',
+top: '0dp',
+				text: self._title,
+//				textAlign: Ti.UI.a
+			 });
+		view.add(titleLabel);
 
 //		var textArea = Ti.UI.createTextField({
 //width: '80%',
@@ -80,6 +92,24 @@ bottom: '0dp',
 		view.add(cancelButton);
 
 		self.window.add(view);
+
+		self.window.addEventListener('close', function(){
+				self.fireEvent('click', {
+						source: self,
+						index: self.index,
+						value: self.value,
+					});
+			});
+		okButton.addEventListener('click', function(){
+				self.value = textBox.value;
+				self.index = 0;
+				self.hide();
+			});
+		cancelButton.addEventListener('click', function(){
+				self.value = '';
+				self.index = self.cancel;
+				self.hide();
+			});
 
 		updateProperty.call(self);
 	}

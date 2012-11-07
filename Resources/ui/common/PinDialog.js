@@ -25,7 +25,33 @@ module.exports = (function(global){
 		options = options || {};
 
 		var isAndroid = Ti.Platform.osname === 'android';
-	
+
+		var tagsForReblog = Ti.App.Properties.getString('tagsForReblog', '');
+		tagsForReblog = tagsForReblog.split(/[\n\r]/);
+		for(var i = tagsForReblog.length - 1; 0 <= i; i--) {
+			if (!tagsForReblog[i].length) {
+				tagsForReblog.splice(i, 1);
+			}
+		}
+		var tags_ = {};
+		var maxCount = 0;
+		for(var i = tagsForReblog.length - 1; 0 <= i; i--) {
+			tagsForReblog[i] = tagsForReblog[i].split(',');
+			for(var j = 0, tag; tag = tagsForReblog[i][j]; j++) {
+				tags_[tag] = tags_[tag] || 0;
+				tags_[tag]++;
+				maxCount = maxCount < tags_[tag] ? tags_[tag] : maxCount;
+			}
+		}
+		var tags = [];
+		for(var i = maxCount; 0 < i; i--) {
+			for(tag in tags_) {
+				if (i == tags_[tag]) {
+					tags[tags.length] = tag;
+				}
+			}
+		}
+
 		var wndOptions = {
 				backgroundColor: 'black',
 				opacity: 0.7,
@@ -63,9 +89,31 @@ top: '40dp',
 				var dlg = new CommentDialog({
 						title: 'リブログ時のコメントを指定',
 					});
+				dlg.addEventListener('click', function(e){
+						if (e.index != e.source.cancel) {
+							alert(e.value);
+						}
+					});
 				dlg.show({ containingTab: self.containingTab });
 			});
 		view.add(commentButton);
+
+		var tagBox = Ti.UI.createWebView({
+				top: '60dp',
+				width: '90%',
+				bottom: '40dp',
+				url: 'tagview.html',
+//				url: Ti.Filesystem.resourcesDirectory + '/etc/about.html',
+			});
+		view.add(tagBox);
+
+		tagBox.addEventListener('load', function(){
+				var tag = tags.length ? '["' + tags.join('","') + '"]' : '[]';
+				tagBox.evalJS('updateTags('+tag+');');
+			});
+		Ti.App.addEventListener("onTagClicked", function(e){
+				tagBox.evalJS('toggleTags(["'+e.value+'"]);');
+			});
 
 		self.window.add(view);
 	}

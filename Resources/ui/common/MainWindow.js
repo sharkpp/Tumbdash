@@ -308,33 +308,37 @@ logger.debug(JSON.stringify(tagsForReblog));
 	toolbar.add(nextButton);
 
 	var pinButton = createToolbarButton({
-							enabled: false,
+//							enabled: false,
 							backgroundImage:         '/images/pin.png',
 							backgroundDisabledImage: '/images/pin-disabled.png',
 							backgroundSelectedImage: '/images/pin-selected.png',
 						});
 	layout.addItem('toolbar-pin-button', pinButton);
 	pinButton.addEventListener('click', function() {
-		//	if (!tagsForReblog.length || dashboard.pinState()) {
-		//		// タグが指定されてなかったりPinの解除をしようとしていたらそのまま実行
-		//		dashboard.pin();
-		//	}
-		//	else {
-		//		var dlg = createTagSelectDialog();
-		//		dlg.addEventListener('click', function(e) {
-		//				if (0 <= e.index) {
-		//					var options = dlg.getOptions();
-		//					dashboard.pin(dashboard.currentId(), 0 < e.index ? options[e.index] : '');
-		//				}
-		//			});
-		//		dlg.show();
-		//	}
-			var PinDialog = require('ui/common/PinDialog');
-			var dlg = new PinDialog({
-				});
-			dlg.addEventListener('click', function(e){
-				});
-			dlg.show({ containingTab: self.containingTab });
+			if(!debugMode){
+				if (!tagsForReblog.length || dashboard.pinState()) {
+					// タグが指定されてなかったりPinの解除をしようとしていたらそのまま実行
+					dashboard.pin();
+				}
+				else {
+					var dlg = createTagSelectDialog();
+					dlg.addEventListener('click', function(e) {
+							if (0 <= e.index) {
+								var options = dlg.getOptions();
+								dashboard.pin(dashboard.currentId(), 0 < e.index ? options[e.index] : '');
+							}
+						});
+					dlg.show();
+				}	
+			}
+			else {
+				var PinDialog = require('ui/common/PinDialog');
+				var dlg = new PinDialog({
+					});
+				dlg.addEventListener('click', function(e){
+					});
+				dlg.show({ containingTab: self.containingTab });
+			}
 		});
 	toolbar.add(pinButton);
 
@@ -351,7 +355,7 @@ logger.debug(JSON.stringify(tagsForReblog));
 	enableToolbarButton(reblogButton, false);
 	enableToolbarButton(prevButton,   false);
 	enableToolbarButton(nextButton,   false);
-	enableToolbarButton(pinButton,    false);
+//	enableToolbarButton(pinButton,    false);
 
 	view.add(toolbar);
 
