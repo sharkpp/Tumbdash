@@ -12,6 +12,12 @@ module.exports = (function(global){
 			self = new K();
 		}
 
+		self.selectedTags = [];
+		self.comment = '';
+		self.liked = false;
+		self.cancel = -1;
+		self.index = self.cancel;
+
 		setupUI.call(self, options);
 
 		return self;
@@ -23,6 +29,7 @@ module.exports = (function(global){
 		var self = this;
 
 		options = options || {};
+		var disableLike = options['disableLike'] || false;
 
 		var isAndroid = Ti.Platform.osname === 'android';
 
@@ -52,6 +59,10 @@ module.exports = (function(global){
 			}
 		}
 
+		// レイアウト適用モジュールを読み込み
+		var UiLayouter = require('UiLayouter');
+		var layout;
+
 		var wndOptions = {
 				backgroundColor: 'black',
 				opacity: 0.7,
@@ -61,61 +72,114 @@ module.exports = (function(global){
 		}
 	
 		self.window = Ti.UI.createWindow(wndOptions);
+		layout = new UiLayouter('PinDialog');
 
 		var view = Ti.UI.createView({ 
-				backgroundColor: 'lightgray',
-				borderColor: 'white',
-left: '20dp',
-top: '20dp',
-right: '20dp',
-bottom: '20dp',
+				backgroundColor: 'white',
+//				borderColor: 'white',
 			 });
 
+		var buttonArea = Ti.UI.createView({ 
+				backgroundColor: 'white',
+//				borderColor: 'white',
+			 });
+		view.add(buttonArea);
+
 		var likeCheck = Ti.UI.createSwitch({
-left: '0dp',
-top: '0dp',
-				title: '♡',
+				title: '好き',
+				color: 'black',
 				style: Titanium.UI.Android.SWITCH_STYLE_CHECKBOX, 
+				value: self.liked,
+				visible: !disableLike,
 			});
-		view.add(likeCheck);
+		buttonArea.add(likeCheck);
 
 		var commentButton = Ti.UI.createButton({
-left: '0dp',
-top: '40dp',
 				title: 'コメント',
 			});
+		buttonArea.add(commentButton);
+
+		var tagsList = Ti.UI.createWebView({
+				url: 'tagview.html',
+			});
+		view.add(tagsList);
+
+		var okButton = Ti.UI.createButton({
+				title: '決定',
+			});
+		buttonArea.add(okButton);
+
+		var cancelButton = Ti.UI.createButton({
+				title: 'キャンセル',
+			});
+		buttonArea.add(cancelButton);
+
+		self.window.add(view);
+
+		// レイアウトの登録
+		
+		layout.addItem('view', view);
+		layout.addItem('tags-list', tagsList);
+		layout.addItem('button-area', buttonArea);
+		layout.addItem('like-check', likeCheck);
+		layout.addItem('comment-button', commentButton);
+		layout.addItem('ok-button', okButton);
+		layout.addItem('cancel-button', cancelButton);
+		
+		// イベントリスナー登録
+
 		commentButton.addEventListener('click', function(){
 				var CommentDialog = require('ui/common/CommentDialog');
 				var dlg = new CommentDialog({
 						title: 'リブログ時のコメントを指定',
+						value: self.comment,
 					});
 				dlg.addEventListener('click', function(e){
 						if (e.index != e.source.cancel) {
-							alert(e.value);
+							self.comment = e.value;
 						}
 					});
 				dlg.show({ containingTab: self.containingTab });
 			});
-		view.add(commentButton);
-
-		var tagBox = Ti.UI.createWebView({
-				top: '60dp',
-				width: '90%',
-				bottom: '40dp',
-				url: 'tagview.html',
-//				url: Ti.Filesystem.resourcesDirectory + '/etc/about.html',
-			});
-		view.add(tagBox);
-
-		tagBox.addEventListener('load', function(){
+		tagsList.addEventListener('load', function(){
 				var tag = tags.length ? '["' + tags.join('","') + '"]' : '[]';
-				tagBox.evalJS('updateTags('+tag+');');
+				tagsList.evalJS('updateTags('+tag+');');
 			});
 		Ti.App.addEventListener("onTagClicked", function(e){
-				tagBox.evalJS('toggleTags(["'+e.value+'"]);');
+				var found = false;
+				for(var i = 0, tag; tag = self.selectedTags[i]; i++) {
+					if (e.value == tag) {
+						self.selectedTags.splice(i, 1);
+						found = true;
+						break;
+					}
+				}
+				if (!found) {
+					self.selectedTags.push(e.value);
+				}
+				tagsList.evalJS('toggleTags(["'+e.value+'"]);');
 			});
-
-		self.window.add(view);
+		okButton.addEventListener('click', function(){
+				self.liked = likeCheck.value;
+				self.index = 0;
+				self.hide();
+			});
+		cancelButton.addEventListener('click', function(){
+				self.selectedTags = [];
+				self.comment = '';
+				self.liked = false;
+				self.index = self.cancel;
+				self.hide();
+			});
+		self.window.addEventListener('close', function(){
+				self.fireEvent('click', {
+						source: self,
+						tags: self.selectedTags,
+						comment: self.comment,
+						liked: self.liked,
+						index: self.index,
+					});
+			});
 	}
 
 	PinDialog.prototype.show = function(options) {

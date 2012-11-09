@@ -32,6 +32,7 @@ module.exports = (function(global){
 		self._right  = options['right']  || '';
 		self._bottom = options['bottom'] || '';
 		self.cancel  = options['cancel'] || -1;
+		self.value   = options['value'] || '';
 
 		var isAndroid = Ti.Platform.osname === 'android';
 	
@@ -72,6 +73,7 @@ top: '0dp',
 
 		var textBox = Ti.UI.createTextField({
 width: '80%',
+				value: self.value,
 			});
 		view.add(textBox);
 

@@ -315,30 +315,25 @@ logger.debug(JSON.stringify(tagsForReblog));
 						});
 	layout.addItem('toolbar-pin-button', pinButton);
 	pinButton.addEventListener('click', function() {
-			if(!debugMode){
-				if (!tagsForReblog.length || dashboard.pinState()) {
-					// タグが指定されてなかったりPinの解除をしようとしていたらそのまま実行
-					dashboard.pin();
-				}
-				else {
-					var dlg = createTagSelectDialog();
-					dlg.addEventListener('click', function(e) {
-							if (0 <= e.index) {
-								var options = dlg.getOptions();
-								dashboard.pin(dashboard.currentId(), 0 < e.index ? options[e.index] : '');
-							}
-						});
-					dlg.show();
-				}	
+			if (!tagsForReblog.length || dashboard.pinState()) {
+				// タグが指定されてなかったりPinの解除をしようとしていたらそのまま実行
+				dashboard.pin();
 			}
 			else {
 				var PinDialog = require('ui/common/PinDialog');
 				var dlg = new PinDialog({
+//						disableLike: true,
 					});
 				dlg.addEventListener('click', function(e){
+						if (e.index != e.source.cencel) {					
+							dashboard.pin(dashboard.currentId(), e.tags.join(','));
+						}
+	//					Ti.UI.createNotification({message:
+		//					e.tags.join(',') + '/' + e.comment + '/' + (e.liked ? '-' : '+')
+			//				}).show();
 					});
 				dlg.show({ containingTab: self.containingTab });
-			}
+			}	
 		});
 	toolbar.add(pinButton);
 
