@@ -166,7 +166,7 @@ logger.debug(JSON.stringify(tagsForReblog));
 	var loaderHtml = file.read().toString();
 
 	//
-	
+
 	var posts = require('tumblrPost').tumblrPost(logger);
 
 	//create object instance, a parasitic subclass of Observable
@@ -254,7 +254,7 @@ logger.debug(JSON.stringify(tagsForReblog));
 						disableLike: true,
 					});
 				dlg.addEventListener('click', function(e){
-						if (e.index != e.source.cancel) {					
+						if (e.index != e.source.cancel) {
 							dashboard.reblog(dashboard.currentId(), e.tags.join(','), e.comment);
 						}
 					});
@@ -320,7 +320,7 @@ logger.debug(JSON.stringify(tagsForReblog));
 						}
 					});
 				dlg.show();
-			}	
+			}
 		});
 	toolbar.add(pinButton);
 
