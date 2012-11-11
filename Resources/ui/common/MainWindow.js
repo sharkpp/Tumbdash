@@ -159,20 +159,6 @@ logger.debug(JSON.stringify(tagsForReblog));
 		}
 	}
 
-	var createTagSelectDialog = function() {
-		var opts = {
-				cancel: -1,
-				options: ['タグを指定しない'],
-				selectedIndex: 0,
-				destructive: 0,
-				title: 'リブログ時のタグを選択'
-			};
-		for (var i = 0; i < tagsForReblog.length; i++) {
-			opts['options'].push(tagsForReblog[i]);
-		}
-		return Ti.UI.createOptionDialog(opts);
-	}
-
 	var path = Ti.Filesystem.resourcesDirectory + 'etc/loader.html';
 	var file = Ti.Filesystem.getFile(path);
 	var loaderHtml = file.read().toString();
@@ -261,14 +247,16 @@ logger.debug(JSON.stringify(tagsForReblog));
 				dashboard.reblog();
 			}
 			else {
-				var dlg = createTagSelectDialog();
-				dlg.addEventListener('click', function(e) {
-						if (0 <= e.index) {
-							var options = dlg.getOptions();
-							dashboard.reblog(dashboard.currentId(), 0 < e.index ? options[e.index] : '');
+				var PinDialog = require('ui/common/PinDialog');
+				var dlg = new PinDialog({
+						disableLike: true,
+					});
+				dlg.addEventListener('click', function(e){
+						if (e.index != e.source.cencel) {					
+							dashboard.reblog(dashboard.currentId(), e.tags.join(','), e.comment);
 						}
 					});
-				dlg.show();
+				dlg.show({ containingTab: self.containingTab });
 			}
 		});
 	toolbar.add(reblogButton);
@@ -326,11 +314,8 @@ logger.debug(JSON.stringify(tagsForReblog));
 					});
 				dlg.addEventListener('click', function(e){
 						if (e.index != e.source.cencel) {					
-							dashboard.pin(dashboard.currentId(), e.tags.join(','));
+							dashboard.pin(dashboard.currentId(), e.tags.join(','), e.comment, e.liked);
 						}
-	//					Ti.UI.createNotification({message:
-		//					e.tags.join(',') + '/' + e.comment + '/' + (e.liked ? '-' : '+')
-			//				}).show();
 					});
 				dlg.show({ containingTab: self.containingTab });
 			}	

@@ -825,10 +825,12 @@ self.log.debug('cache sweep stop '+self.cacheList.length);
 	}
 
 	// IDを保持
-	Dashboard.prototype.pin = function(id, tags) {
+	Dashboard.prototype.pin = function(id, tags, comment, liked) {
 		var self = this;
 		id   = id || self.currentId();
 		tags = tags || '';
+		comment = comment || '';
+		liked = liked || false;
 		// すでにバッファに存在する場合は削除
 		for (var i = 0, num = self.pinBuffer.length; i < num; i++) {
 			if (id == self.pinBuffer[i]['id']) {
@@ -837,7 +839,7 @@ self.log.debug('cache sweep stop '+self.cacheList.length);
 				return;
 			}
 		}
-		self.pinBuffer.push({ id: id, tags: tags });
+		self.pinBuffer.push({ id: id, tags: tags, comment: comment, liked: liked });
 		setTimeout(function(){ self.fireEvent('updatePin', id); }, 1);
 	}
 
@@ -912,15 +914,16 @@ self.log.debug('cache sweep stop '+self.cacheList.length);
 	}
 
 	// IDを指定しリブログ
-	Dashboard.prototype.reblog = function(id, tags) {
+	Dashboard.prototype.reblog = function(id, tags, comment) {
 		var self = this;
 		tags = tags || '';
+		comment = comment || '';
 		var reblogList = [];
 		if (self.pinBuffer.length) {
 			reblogList = self.pinBuffer;
 		}
 		else {
-			reblogList.push({ id: id || self.currentId(), tags: tags });
+			reblogList.push({ id: id || self.currentId(), tags: tags, comment: comment });
 		}
 		for (var i = 0, reblogItem; reblogItem = reblogList[i]; i++) {
 			var id = reblogItem['id'];
@@ -929,6 +932,7 @@ self.log.debug('cache sweep stop '+self.cacheList.length);
 					reblog_key: self.cacheData[id]['reblog_key'],
 					hostname: self.blog['hostname'],
 					tags: reblogItem['tags'],
+					comment: reblogItem['comment'],
 					retry: 0,
 				});
 		}
@@ -1005,9 +1009,12 @@ self.log.debug('cache sweep stop '+self.cacheList.length);
 		var pinBuffer = JSON.parse(data);
 		self.pinBuffer = [];
 		for (var i = 0, num = pinBuffer.length; i < num; i++) {
-			var id = pinBuffer[i]['id'];
-			var tags = pinBuffer[i]['tags'] || '';
-			self.pinBuffer.push({ id: id, tags: tags });
+			self.pinBuffer.push({
+					id:      pinBuffer[i]['id'],
+					tags:    pinBuffer[i]['tags']    || '',
+					comment: pinBuffer[i]['comment'] || '',
+					liked:   pinBuffer[i]['liked']   || false,
+				});
 		}
 	}
 
