@@ -25,6 +25,8 @@ module.exports = (function(global){
 
 	K.prototype = PinDialog.prototype;
 
+	var lib = require('lib');
+
 	function setupUI(options) {
 		var self = this;
 
@@ -63,15 +65,10 @@ module.exports = (function(global){
 		var UiLayouter = require('UiLayouter');
 		var layout;
 
-		var wndOptions = {
+		self.window = lib.UI.createLightWindow({
 				backgroundColor: 'black',
 				opacity: 0.7,
-			};
-		if (isAndroid) {
-			wndOptions['navBarHidden'] = true;
-		}
-	
-		self.window = Ti.UI.createWindow(wndOptions);
+			});
 		layout = new UiLayouter('PinDialog');
 
 		var view = Ti.UI.createView({ 
@@ -138,8 +135,22 @@ module.exports = (function(global){
 						if (e.index != e.source.cancel) {
 							self.comment = e.value;
 						}
+						else {
+							self.comment = '';
+						}
+						// コメントの有無でマークをボタンに付ける
+						var title = commentButton.title;
+						title = title.replace('✓', '');
+						if (self.comment) {
+							//マークを付ける
+							commentButton.title = '✓' + title;
+						}
+						else {
+							// 元に戻す
+							commentButton.title = title;
+						}
 					});
-				dlg.show({ containingTab: self.containingTab });
+				dlg.show();
 			});
 		tagsList.addEventListener('load', function(){
 				var tag = tags.length ? '["' + tags.join('","') + '"]' : '[]';
@@ -182,17 +193,9 @@ module.exports = (function(global){
 			});
 	}
 
-	PinDialog.prototype.show = function(options) {
+	PinDialog.prototype.show = function() {
 		var self = this;
-		options = options || {};
-		var containingTab = options['containingTab'] || undefined;
-		if (containingTab) {
-			self.containingTab = containingTab;
-			containingTab.open(self.window, { animation: false });
-		}
-		else {
-			self.window.open({modal: true});
-		}
+		self.window.open();
 	}
 
 	PinDialog.prototype.hide = function() {

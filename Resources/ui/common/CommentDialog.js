@@ -19,6 +19,8 @@ module.exports = (function(global){
 
 	K.prototype = CommentDialog.prototype;
 
+	var lib = require('lib');
+
 	function setupUI(options) {
 		var self = this;
 
@@ -36,15 +38,10 @@ module.exports = (function(global){
 
 		var isAndroid = Ti.Platform.osname === 'android';
 	
-		var wndOptions = {
+		self.window = lib.UI.createLightWindow({
 				backgroundColor: 'black',
 				opacity: 0.7,
-			};
-		if (isAndroid) {
-			wndOptions['navBarHidden'] = true;
-		}
-	
-		self.window = Ti.UI.createWindow(wndOptions);
+			});
 
 		var view = Ti.UI.createView({ 
 				backgroundColor: 'lightgray',
@@ -95,6 +92,9 @@ bottom: '0dp',
 
 		self.window.add(view);
 
+		self.window.addEventListener('focus', function(){
+				textBox.focus();
+			});
 		self.window.addEventListener('close', function(){
 				self.fireEvent('click', {
 						source: self,
@@ -161,15 +161,9 @@ bottom: '0dp',
 		self._bottom = x;
 	});
 
-	CommentDialog.prototype.show = function(options) {
+	CommentDialog.prototype.show = function() {
 		var self = this;
-		options = options || {};
-		if (options['containingTab']) {
-			options['containingTab'].open(self.window, { animation: false });
-		}
-		else {
-			self.window.open({modal: true});
-		}
+		self.window.open();
 	}
 
 	CommentDialog.prototype.hide = function() {

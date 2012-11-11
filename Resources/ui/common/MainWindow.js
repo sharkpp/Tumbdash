@@ -12,6 +12,8 @@ function MainWindow(dashboard, logger) {
 	var isAndroid = osname === 'android';
 	var isTablet  = osname === 'ipad' || (isAndroid && (width > 899 || height > 899));
 
+	var lib = require('lib');
+
 	// レイアウト適用モジュールを読み込み
 	var UiLayouter = require('UiLayouter');
 	var layout;
@@ -175,7 +177,7 @@ logger.debug(JSON.stringify(tagsForReblog));
 		wndOptions['exitOnClose']  = true;
 	}
 
-	var self = Ti.UI.createWindow(wndOptions);
+	var self = lib.UI.createWindow(wndOptions);
 	var view = Ti.UI.createView();
 
 	layout = new UiLayouter('MainWindow');
@@ -252,11 +254,11 @@ logger.debug(JSON.stringify(tagsForReblog));
 						disableLike: true,
 					});
 				dlg.addEventListener('click', function(e){
-						if (e.index != e.source.cencel) {					
+						if (e.index != e.source.cancel) {					
 							dashboard.reblog(dashboard.currentId(), e.tags.join(','), e.comment);
 						}
 					});
-				dlg.show({ containingTab: self.containingTab });
+				dlg.show();
 			}
 		});
 	toolbar.add(reblogButton);
@@ -310,14 +312,14 @@ logger.debug(JSON.stringify(tagsForReblog));
 			else {
 				var PinDialog = require('ui/common/PinDialog');
 				var dlg = new PinDialog({
-//						disableLike: true,
+						disableLike: true,
 					});
 				dlg.addEventListener('click', function(e){
-						if (e.index != e.source.cencel) {					
+						if (e.index != e.source.cancel) {
 							dashboard.pin(dashboard.currentId(), e.tags.join(','), e.comment, e.liked);
 						}
 					});
-				dlg.show({ containingTab: self.containingTab });
+				dlg.show();
 			}	
 		});
 	toolbar.add(pinButton);

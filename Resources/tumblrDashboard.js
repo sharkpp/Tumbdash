@@ -376,6 +376,9 @@ self.log.debug('dashboard request failed!');
 		if (req['tags'] && req['tags'].length) { // タグを追加
 			options['tags'] = req['tags'];
 		}
+		if (req['comment']) { // コメントを追加
+			options['comment'] = req['comment'];
+		}
 
 self.log.debug('reblog start #'+req['id']+' queue:'+self.reblogQueue.length);
 
