@@ -245,9 +245,7 @@ self.log.debug('login suceess');
 
 		var options = self.requestQue[0];
 
-	//	options['reblog_info'] = 'true';
-
-		tumblr.request(self.apiBaseUrl + 'v2/user/dashboard', options, {}, 'POST', function(e) {
+		tumblr.request(self.apiBaseUrl + 'v2/user/dashboard' + '?reblog_info=true', options, {}, 'POST', function(e) {
 				self.state      = self.STATE_IDLE;
 				self.requesting = false;
 				if (e.success && e.result.text) {
@@ -353,6 +351,21 @@ self.log.debug('dashboard request failed!');
 		for (var i = 0, blog; blog = self.blogs[i]; i++) {
 			if (name == blog['name']) {
 				return true;
+			}
+		}
+		return false;
+	}
+	
+	function isReblogFromMyBlog(post) {
+		var self = this;
+		var from_name = post['reblogged_from_name'] || '';
+		var root_name = post['reblogged_root_name'] || '';
+		if (from_name || root_name) {
+			for (var i = 0, blog; blog = self.blogs[i]; i++) {
+				if (root_name == blog['name'] ||
+					from_name == blog['name']) {
+					return true;
+				}
 			}
 		}
 		return false;
@@ -465,8 +478,11 @@ self.log.debug('reblog suceess "'+e.result.text+'"');
 			}
 			if (post) {
 				var success = true;
-				if (self.hideMyPosts) {
+				if (self.hideMyPosts) { // 自分のポストを非表示
 					success = success & !isMyBlog.call(self, post['blog_name']);
+				}
+				if (self.hideReblogFromMyself) { // 自分からのリブログを非表示
+					success = success & !isReblogFromMyBlog.call(self, post);
 				}
 				switch (post['type']) {
 				case 'text':   success = success & !self.hideTextPosts;  break;
@@ -976,6 +992,7 @@ self.log.debug('cache sweep stop '+self.cacheList.length);
 	Dashboard.prototype.loadCache = function() {
 		var self = this;
 		var file, data;
+		var resetCache = false;
 
 		// cacheList
 		file = Ti.Filesystem.getFile(self.cacheListPath);
@@ -983,7 +1000,13 @@ self.log.debug('cache sweep stop '+self.cacheList.length);
 		if (!data || data.length <= 0) {
 			data = '{}';
 		}
-		var cacheList = JSON.parse(data);
+		var cacheList = [];
+		try {
+			cacheList = JSON.parse(data);
+		}
+		catch(e) {
+			resetCache = true;
+		}
 		self.cacheList = [];
 		self.cacheData = {};
 		for (var i = 0, num = cacheList.length; i < num; i++) {
@@ -1009,7 +1032,13 @@ self.log.debug('cache sweep stop '+self.cacheList.length);
 		if (!data || data.length <= 0) {
 			data = '{}';
 		}
-		var pinBuffer = JSON.parse(data);
+		var pinBuffer = [];
+		try {
+			pinBuffer = JSON.parse(data);
+		}
+		catch(e) {
+			resetCache = true;
+		}
 		self.pinBuffer = [];
 		for (var i = 0, num = pinBuffer.length; i < num; i++) {
 			self.pinBuffer.push({
@@ -1018,6 +1047,11 @@ self.log.debug('cache sweep stop '+self.cacheList.length);
 					comment: pinBuffer[i]['comment'] || '',
 					liked:   pinBuffer[i]['liked']   || false,
 				});
+		}
+
+		if (resetCache) {
+			alert('キャッシュデータに異常があったためリセットをしました');
+			saveCache();
 		}
 	}
 
@@ -1090,6 +1124,7 @@ self.log.debug('cache sweep stop '+self.cacheList.length);
 		self.hideAnswerPosts = Ti.App.Properties.getBool('hideAnswerPosts', false);
 		// まとめ
 		self.hideEnable = self.hideMyPosts
+		               || self.hideReblogFromMyself
 		               || self.hideTextPosts
 		               || self.hidePhotoPosts
 		               || self.hideQuotePosts

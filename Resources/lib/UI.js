@@ -34,6 +34,18 @@ module.exports = (function(global){
 	}
 	var backActionPop = function(){
 		var action = backActionHistory_.pop();
+		if (action.menuInfo) {
+		//	var menu = action.menuInfo.menu;
+		//	var menuItems = action.menuInfo.menuItems;
+		//	for (var i = 0, itemId; itemId = menuItems[i]; i++) {
+		//		var item = menu.findItem(itemId);
+		//		item.enabled = true;
+		//	}
+			if (action.window.activity) {
+				action.menuInfo.menu.clear();
+				action.window.activity.fireEvent('menucreate', action.menuInfo);
+			}
+		}
 		if (action.callback) {
 			action.callback();
 		}
@@ -94,14 +106,55 @@ module.exports = (function(global){
 		var self = this;
 		window.addEventListener('focus', function(){
 				currentWindow_ = window;
-//Ti.UI.createNotification({message: 'focus'}).show();
 			});
-//		window.addEventListener('blur', function(){
-//				currentWindow_ = null;
-//	Ti.UI.createNotification({message: 'blur'}).show();
-//			});
 		window.addEventListener('android:back', backActionHook);
+		window.addEventListener('open', function(e){
+				var activity = window.activity;
+				activity.onCreateOptionsMenu = function(e){
+						activity.fireEvent('menucreate', e);
+					};
+				activity.onPrepareOptionsMenu = function(e){
+						activity.fireEvent('menuprepare', e);
+					};
+				activity.addEventListener('menuprepare', function(e){
+						var action = backActionHistory_[backActionHistory_.length - 1];
+						if (!action.isWindow) {
+						//	var menuItems = [];
+						//	for (var i = 0, item; item = e.menu.items[i]; i++) {
+						//		if (item.enabled) {
+						//			menuItems.push(item.itemId);
+						//			item.enabled = false;
+						//		}
+						//	}
+						//	action.menuInfo = {
+						//			menu: e.menu,
+						//			menuItems: menuItems,
+						//		};
+							action.menuInfo = e;
+							e.menu.clear();
+							var menuBack = e.menu.add({ title : '戻る' });
+							menuBack.setIcon(Ti.Android.R.drawable.ic_menu_revert);
+							menuBack.addEventListener('click', function(e) {
+									backActionHook.call(self);
+								});
+//Ti.UI.createNotification({message:'clear menu #'}).show();
+						}
+//Ti.UI.createNotification({message:'prepare mene #2,'+backActionHistory_.length}).show();
+					});
+			});
 		backActionPush.call(self, window);
+		// Ti.UI.Windowを拡張
+//		var getActivityOrigin = window.getActivity;
+//		lib.extend(window, {
+//				getActivity: function() {
+//						var activity = window.activity;
+//						if (!activity)
+//							return activity;
+//						var MyActivity = require('lib/Android/Activity');
+//						return new MyActivity(activity);
+//					},
+//				getActivityOrigin: getActivityOrigin,
+//			});
 	};
 
 	// createLightWindow(params)
@@ -128,7 +181,7 @@ module.exports = (function(global){
 //		w.addEventListener('android:back', fn);
 		w.add(v);
 		// 戻るボタンのために状態を保存
-		backActionPush.call(self, w, function(){
+		backActionPush.call(self, v, function(){
 				w.remove(v);
 				v.fireEvent('blur', {
 						source: v,

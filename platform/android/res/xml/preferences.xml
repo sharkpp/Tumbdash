@@ -28,6 +28,11 @@
 				android:summary=""
 				android:key="hideMyPosts" />
 			<CheckBoxPreference
+				android:title="自分からのリブログを非表示"
+				android:defaultValue="false"
+				android:summary=""
+				android:key="hideReblogFromMyself" />
+			<CheckBoxPreference
 				android:title="テキストを非表示"
 				android:defaultValue="false"
 				android:summary=""

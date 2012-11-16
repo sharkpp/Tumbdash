@@ -19,6 +19,8 @@ module.exports = (function(global){
 
 	K.prototype = JumpDialog.prototype;
 
+	var lib = require('lib');
+
 	function setupUI(options) {
 		var self = this;
 
@@ -41,15 +43,10 @@ module.exports = (function(global){
 
 		var isAndroid = Ti.Platform.osname === 'android';
 	
-		var wndOptions = {
+		self.window = lib.UI.createLightWindow({
 				backgroundColor: 'black',
 				opacity: 0.7,
-			};
-		if (isAndroid) {
-			wndOptions['navBarHidden'] = true;
-		}
-	
-		self.window = Ti.UI.createWindow(wndOptions);
+			});
 		layout = new UiLayouter('JumpDialog');
 
 		var view = Ti.UI.createView({ 
@@ -148,13 +145,7 @@ module.exports = (function(global){
 
 	JumpDialog.prototype.show = function(options) {
 		var self = this;
-		options = options || {};
-		if (options['containingTab']) {
-			options['containingTab'].open(self.window, { animation: false });
-		}
-		else {
-			self.window.open({modal: true});
-		}
+		self.window.open();
 	}
 
 	JumpDialog.prototype.hide = function() {

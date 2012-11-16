@@ -355,24 +355,18 @@ logger.debug(JSON.stringify(tagsForReblog));
 logger.debug('resume');
 						dashboard.loadCache();
 						dashboard.reloadCache();
-						//
-						if (0 < jumpPostid) {
-							var index = dashboard.findPost(jumpPostid);
-							jumpPostid = 0;
-							dashboard.jumpPost(index);
-						}
 					});
 				activity.addEventListener('pause', function() {
 logger.debug('pause');
 						dashboard.saveCache();
 					});
-				var pinClear;
-				activity.onCreateOptionsMenu = function(e) {
+				var pinClearId = 1;
+				activity.addEventListener('menucreate', function(e) {
 						var menu = e.menu; // save off menu.
-
-						pinClear = menu.add({ title : 'Pinのクリア' });
-						pinClear.setIcon(Ti.Android.R.drawable.ic_menu_delete);
-						pinClear.addEventListener('click', function(e) {
+//Ti.UI.createNotification({message:'create menu'}).show();
+						var menuPinClear = menu.add({ title : 'Pinのクリア', itemId: pinClearId });
+						menuPinClear.setIcon(Ti.Android.R.drawable.ic_menu_delete);
+						menuPinClear.addEventListener('click', function(e) {
 								var dlg = Ti.UI.createAlertDialog({
 										cancel: 1,
 										message: 'Pinをクリアしますか？',
@@ -399,8 +393,12 @@ logger.debug('pause');
 								dlg.addEventListener('click', function(e){
 logger.debug(''+e.position);
 										jumpPostid = e.id;
+										if (0 < e.id) {
+											var index = dashboard.findPost(e.id);
+											dashboard.jumpPost(index);
+										}
 									});
-								dlg.show({ containingTab: self.containingTab });
+								dlg.show();
 							});
 
 						var menuOption = menu.add({ title : '設定' });
@@ -422,12 +420,14 @@ logger.debug(''+e.position);
 								var w = new AboutWindow()
 								self.containingTab.open(w, { animated:true });
 							});
-					};
-				activity.onPrepareOptionsMenu = function(e) {
+					});
+				activity.addEventListener('menuprepare', function(e) {
 						var menu = e.menu; // save off menu.
-
-						pinClear.setEnabled( 0 < dashboard.totalPin() );
-					};
+						var menuPinClear = menu.findItem(pinClearId);
+						if (menuPinClear) {						
+							menuPinClear.setEnabled( 0 < dashboard.totalPin() );
+						}
+					});
 			});
 	}
 
