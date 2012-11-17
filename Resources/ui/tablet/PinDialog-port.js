@@ -6,11 +6,12 @@ module.exports = (function() {
 					top: '20dp',
 					right: '20dp',
 					bottom: '20dp',
+					borderRadius: 15,
 				},
 			'tags-list': {
 					left: '10dp',
 					top: '10dp',
-					bottom: '90dp',
+					bottom: '100dp',
 					right: '10dp',
 				},
 			'button-area': {
