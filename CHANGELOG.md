@@ -4,15 +4,17 @@
 ## Ver.1.2.0
     + リンクを外部のブラウザで開く機能を実装
     + 移動ボタンのロングプレスでの移動ダイアログ表示機能を実装
-    + キャッシュの検証処理を実装
-    + 自分からのリブログの非表示処理を実装
+    + キャッシュの検証機能を実装
+    + 自分からのリブログの非表示機能を実装
     + 戻るボタンの誤操作防止処理を実装
+    + リブログ時のコメント追加機能を実装
 
     + Implement the ability to open links in external browser.
     + Implement the ability to view Jump dialogs by a long press of the move button.
     + CheckImplement validation for cache.
     + Implementation process of hidden reblogged this from you.
     + Implementation process of the back buttons prevent accidental operation.
+    + Implement the ability to add a comment when reblogged.
 
 ## Ver.1.1.2
     - ポストの移動ダイアログのレイアウトを調整

@@ -71,6 +71,7 @@ top: '0dp',
 		var textBox = Ti.UI.createTextField({
 width: '80%',
 				value: self.value,
+				softKeyboardOnFocus: Ti.UI.Android.SOFT_KEYBOARD_SHOW_ON_FOCUS
 			});
 		view.add(textBox);
 
@@ -96,6 +97,7 @@ bottom: '0dp',
 				textBox.focus();
 			});
 		self.window.addEventListener('close', function(){
+				textBox.blur();
 				self.fireEvent('click', {
 						source: self,
 						index: self.index,
@@ -103,11 +105,13 @@ bottom: '0dp',
 					});
 			});
 		okButton.addEventListener('click', function(){
+				textBox.blur();
 				self.value = textBox.value;
 				self.index = 0;
 				self.hide();
 			});
 		cancelButton.addEventListener('click', function(){
+				textBox.blur();
 				self.value = '';
 				self.index = self.cancel;
 				self.hide();
