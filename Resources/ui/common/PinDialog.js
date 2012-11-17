@@ -72,12 +72,12 @@ module.exports = (function(global){
 		layout = new UiLayouter('PinDialog');
 
 		var view = Ti.UI.createView({ 
-				backgroundColor: 'white',
-//				borderColor: 'white',
+				backgroundColor: 'lightgray',
+				borderColor: 'white',
 			 });
 
 		var buttonArea = Ti.UI.createView({ 
-				backgroundColor: 'white',
+				backgroundColor: 'lightgray',
 //				borderColor: 'white',
 			 });
 		view.add(buttonArea);

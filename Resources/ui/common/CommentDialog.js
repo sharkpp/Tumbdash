@@ -36,61 +36,48 @@ module.exports = (function(global){
 		self.cancel  = options['cancel'] || -1;
 		self.value   = options['value'] || '';
 
+		// レイアウト適用モジュールを読み込み
+		var UiLayouter = require('UiLayouter');
+		var layout;
+
 		var isAndroid = Ti.Platform.osname === 'android';
-	
+
 		self.window = lib.UI.createLightWindow({
 				backgroundColor: 'black',
 				opacity: 0.7,
 			});
+		layout = new UiLayouter('CommentDialog');
 
 		var view = Ti.UI.createView({ 
 				backgroundColor: 'lightgray',
 				borderColor: 'white',
-width: '240dp',
-height: '200dp',
 			 });
 
 		var titleLabel = Ti.UI.createLabel({ 
 				backgroundColor: 'gray',
 				color: 'white',
-width: '100%',
-height: '40dp',
-top: '0dp',
 				text: self._title,
-//				textAlign: Ti.UI.a
+				textAlign: Ti.UI.TEXT_ALIGNMENT_CENTER
 			 });
-		view.add(titleLabel);
 
-//		var textArea = Ti.UI.createTextField({
-//width: '80%',
-//top: '0dp',
-//				title: '決定',
-//			});
-//		view.add(textArea);
-
-		var textBox = Ti.UI.createTextField({
-width: '80%',
+		var textBox = Ti.UI.createTextArea({
 				value: self.value,
 				softKeyboardOnFocus: Ti.UI.Android.SOFT_KEYBOARD_SHOW_ON_FOCUS
 			});
+
+		var okButton = Ti.UI.createButton({ title: '決定' });
+		var cancelButton = Ti.UI.createButton({ title: 'キャンセル' });
+
+		layout.addItem('view', view);
+		layout.addItem('view-title', titleLabel);
+		layout.addItem('text', textBox);
+		layout.addItem('cancel-button', cancelButton);
+		layout.addItem('ok-button', okButton);
+
+		view.add(titleLabel);
 		view.add(textBox);
-
-		var okButton = Ti.UI.createButton({
-width: '50%',
-left: '0%',
-bottom: '0dp',
-				title: '決定',
-			});
 		view.add(okButton);
-
-		var cancelButton = Ti.UI.createButton({
-width: '50%',
-left: '50%',
-bottom: '0dp',
-				title: 'キャンセル',
-			});
 		view.add(cancelButton);
-
 		self.window.add(view);
 
 		self.window.addEventListener('focus', function(){
