@@ -7,6 +7,12 @@ module.exports = (function() {
 					right: '20dp',
 					bottom: '20dp',
 				},
+			'tags-list': {
+					left: '10dp',
+					top: '10dp',
+					bottom: '50dp',
+					right: '10dp',
+				},
 			'button-area': {
 					left: '10dp',
 					right: '10dp',
@@ -15,27 +21,25 @@ module.exports = (function() {
 				},
 			'like-check': {
 					left: '0%',
+					top:   '0%',
 					height:'100%',
 					width: '25%',
 				},
 			'comment-button': {
 					left:  '25%',
+					top:   '0%',
 					height:'100%',
 					width: '25%',
 				},
-			'tags-list': {
-					left: '10dp',
-					top: '10dp',
-					bottom: '60dp',
-					right: '20dp',
-				},
 			'ok-button': {
 					left:  '50%',
+					top:   '0%',
 					height:'100%',
 					width: '25%',
 				},
 			'cancel-button': {
 					left:  '75%',
+					top:   '0%',
 					height:'100%',
 					width: '25%',
 				},
