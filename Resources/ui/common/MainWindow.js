@@ -23,8 +23,7 @@ function MainWindow(dashboard, logger) {
 	var pinAfterMove, savePinState;
 	var tagsForReblog = '';
 
-	var updateProperties = function()
-	{
+	var updateProperties = function() {
 		// Pin指定後の動作
 		pinAfterMove = parseInt(Ti.App.Properties.getString('pinAfterMove', '-1'));
 		pinAfterMove = -1 == pinAfterMove || 0 == pinAfterMove || 1 == pinAfterMove ? pinAfterMove : -1;
@@ -161,6 +160,23 @@ logger.debug(JSON.stringify(tagsForReblog));
 		}
 	}
 
+	var showJumpDialog = function(e) {
+		var JumpDialog = require('ui/common/JumpDialog');
+		var dlg = new JumpDialog({
+				cached: dashboard.getCachedPostId(),
+				id: dashboard.currentId(),
+			});
+		dlg.addEventListener('click', function(e){
+logger.debug(''+e.position);
+				jumpPostid = e.id;
+				if (0 < e.id) {
+					var index = dashboard.findPost(e.id);
+					dashboard.jumpPost(index);
+				}
+			});
+		dlg.show();
+	}
+
 	var path = Ti.Filesystem.resourcesDirectory + 'etc/loader.html';
 	var file = Ti.Filesystem.getFile(path);
 	var loaderHtml = file.read().toString();
@@ -168,6 +184,8 @@ logger.debug(JSON.stringify(tagsForReblog));
 	//
 
 	var posts = require('tumblrPost').tumblrPost(logger);
+
+	var eventBlock = false;
 
 	//create object instance, a parasitic subclass of Observable
 
@@ -271,6 +289,10 @@ logger.debug(JSON.stringify(tagsForReblog));
 						});
 	layout.addItem('toolbar-prev-button', prevButton);
 	prevButton.addEventListener('click', function() {
+			if (eventBlock) { // longpress判定後のイベント通知をキャンセル
+				eventBlock = false;
+				return;
+			}
 			if (dashboard.prevPost()) {
 				enableToolbarButton(prevButton, false);
 				enableToolbarButton(nextButton, false);
@@ -278,6 +300,7 @@ logger.debug(JSON.stringify(tagsForReblog));
 			// デバッグ
 			updateConsole();
 		});
+	prevButton.addEventListener('longpress', function(e) { eventBlock = true; showJumpDialog(); });
 	toolbar.add(prevButton);
 
 	var nextButton = createToolbarButton({
@@ -288,6 +311,10 @@ logger.debug(JSON.stringify(tagsForReblog));
 						});
 	layout.addItem('toolbar-next-button', nextButton);
 	nextButton.addEventListener('click', function() {
+			if (eventBlock) { // longpress判定後のイベント通知をキャンセル
+				eventBlock = false;
+				return;
+			}
 			if (dashboard.nextPost()) {
 				enableToolbarButton(prevButton, false);
 				enableToolbarButton(nextButton, false);
@@ -295,6 +322,7 @@ logger.debug(JSON.stringify(tagsForReblog));
 			// デバッグ
 			updateConsole();
 		});
+	nextButton.addEventListener('longpress', function(e) { eventBlock = true; showJumpDialog(); });
 	toolbar.add(nextButton);
 
 	var pinButton = createToolbarButton({
@@ -384,22 +412,7 @@ logger.debug('pause');
 
 						var menuAbout = menu.add({ title : '移動' });
 						menuAbout.setIcon(Ti.Android.R.drawable.ic_menu_set_as);
-						menuAbout.addEventListener('click', function(e) {
-								var JumpDialog = require('ui/common/JumpDialog');
-								var dlg = new JumpDialog({
-										cached: dashboard.getCachedPostId(),
-										id: dashboard.currentId(),
-									});
-								dlg.addEventListener('click', function(e){
-logger.debug(''+e.position);
-										jumpPostid = e.id;
-										if (0 < e.id) {
-											var index = dashboard.findPost(e.id);
-											dashboard.jumpPost(index);
-										}
-									});
-								dlg.show();
-							});
+						menuAbout.addEventListener('click', showJumpDialog);
 
 						var menuOption = menu.add({ title : '設定' });
 						menuOption.setIcon(Ti.Android.R.drawable.ic_menu_preferences);
@@ -564,7 +577,7 @@ logger.debug('close');
 
 	dashboard.addEventListener('loadComplite', function(post) {
 			var id = post['id'];
-			webview.html = posts.renderPost(post);
+			posts.renderPost(webview, post);
 			setLabelText(status, String.format("%d/%d",dashboard.currentPost(),dashboard.totalPost()));
 			status.visible = true;
 			pinStatus.visible = dashboard.pinState(id);
@@ -598,6 +611,24 @@ logger.debug('close');
 				if (progress.value == progress.max) {
 					setTimeout(function(){ progress.hide() }, 250);
 					dashboard.saveCache();
+				}
+			}
+		});
+
+	Ti.App.addEventListener("linkclick", function(e) {
+			if (0 < e.url.length) {
+				if (isAndroid) {
+					var intent = Ti.Android.createIntent({
+							action: Ti.Android.ACTION_VIEW,
+						//	className: 'com.android.browser.BrowserActivity',
+						//	packageName: 'com.android.browser',
+						//	data: e.url
+							data: e.url
+						});
+					Ti.Android.currentActivity.startActivity(intent);
+				}
+				else {
+					Ti.Platform.openURL(e.url);
 				}
 			}
 		});

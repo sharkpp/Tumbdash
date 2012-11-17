@@ -4,10 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=no;" />
 <script>
-function onTagClicked() {
-	Ti.App.fireEvent('onTagClicked', {value: this.innerHTML});
+function tagclick() {
+	toggleTags(this.innerHTML);
+	Ti.App.fireEvent('tagclick', { value: this.innerHTML });
+	e.preventDefault();
 }
 function updateTags(tags) {
+	tags = tags.split(',');
 	var body = document.body;
 	while (body.firstChild) {
 		body.removeChild(body.firstChild);
@@ -16,11 +19,12 @@ function updateTags(tags) {
 		var item = document.createElement('div');
 		item.className = 'tag';
 		item.innerHTML = tag;
-		item.onclick = onTagClicked;
+		item.addEventListener('click', tagclick, false);
 		body.appendChild(item);
 	}
 }
 function toggleTags(tags) {
+	tags = tags.split(',');
 	var body = document.body;
 	for (var i = 0, tag; tag = tags[i]; i++) {
 		for (var elm = body.firstChild; elm; elm = elm.nextSibling) {

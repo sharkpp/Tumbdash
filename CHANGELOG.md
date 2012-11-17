@@ -1,6 +1,17 @@
 # CHANGELOG
 
 
+## Ver.1.2.0
+    + リンクを外部のブラウザで開く機能を実装
+    + 移動ボタンのロングプレスでの移動ダイアログ表示機能を実装
+    + キャッシュの検証処理を実装
+    + 自分からのリブログの非表示処理を実装
+
+    + Implement the ability to open links in external browser.
+    + Implement the ability to view Jump dialogs by a long press of the move button.
+    + CheckImplement validation for cache.
+    + Implementation process of hidden reblogged this from you.
+
 ## Ver.1.1.2
     - ポストの移動ダイアログのレイアウトを調整
 
@@ -48,7 +59,6 @@
 * POSTの表示(Chat)
 * POSTの表示(Answer)
 * 画像のキャッシュ
-* 自分からのリブログの非表示
 * リブログ前に確認のダイアログを表示
 * (位置のブックマーク機能)
 * 設定画面でのタグ指定時orタグ指定前に"文字などのエスケープ処理が必要
@@ -56,7 +66,6 @@
 * キャッシュのクリアとリロード処理
   →リロード時にはどの位置から取得すべきか？API的には順に取得すると260件までしか取得できない
   →バックグラウンドでの読み込みに特化すべきか？
-* ポスト内のリンクをタップで外部ブラウザを起動したい
 * ポスト内のリンクをロングタップでメニューが出てほしい
   →ブラウザを選ぶメニュー？共有など？
 * 表示文字の英語対応/多言語対応

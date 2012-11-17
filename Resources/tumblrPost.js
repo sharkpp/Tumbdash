@@ -171,7 +171,7 @@ exports.tumblrPost = (function(global){
 	}
 
 	// POSTを描画
-	tumblrPost.prototype.renderPost = function(post) {
+	tumblrPost.prototype.renderPost = function(webview, post) {
 		var self = this;
 		var postData = '';
 
@@ -196,11 +196,22 @@ exports.tumblrPost = (function(global){
 		}
 
 		// テンプレートに流し込む
-		return applyTemplate.call(self, self.template['@'], {
-		                              'blog_name': post['blog_name'],
-		                              'post_type': post['type'],
-		                              'post_data': postData,
-		                          });
+		webview.html = applyTemplate.call(self, self.template['@'], {
+												'blog_name': post['blog_name'],
+												'post_type': post['type'],
+												'post_data': postData,
+											});
+		webview.evalJS(
+				'(function(){' +
+				'function linkclick(e) {' +
+				'    Titanium.App.fireEvent("linkclick", { url: e.target.href });' +
+				'    e.preventDefault();' +
+				'}' +
+				'for (var i = 0, aTags = document.getElementsByTagName("a"), aTag; aTag = aTags[i]; i++) {' +
+				'    aTag.addEventListener("click", linkclick, false);' +
+				'}' +
+				'})();'
+			);
 	}
 
 	tumblrPost.prototype.updateProperties = function() {

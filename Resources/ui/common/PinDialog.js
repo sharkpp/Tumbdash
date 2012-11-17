@@ -153,10 +153,10 @@ module.exports = (function(global){
 				dlg.show();
 			});
 		tagsList.addEventListener('load', function(){
-				var tag = tags.length ? '["' + tags.join('","') + '"]' : '[]';
+				var tag = '"' + tags.join(',') + '"';
 				tagsList.evalJS('updateTags('+tag+');');
 			});
-		Ti.App.addEventListener("onTagClicked", function(e){
+		Ti.App.addEventListener("tagclick", function(e){
 				var found = false;
 				for(var i = 0, tag; tag = self.selectedTags[i]; i++) {
 					if (e.value == tag) {
@@ -168,7 +168,6 @@ module.exports = (function(global){
 				if (!found) {
 					self.selectedTags.push(e.value);
 				}
-				tagsList.evalJS('toggleTags(["'+e.value+'"]);');
 			});
 		okButton.addEventListener('click', function(){
 				self.liked = likeCheck.value;
