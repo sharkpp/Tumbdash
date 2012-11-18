@@ -50,16 +50,16 @@ function notify(msg) {
 			accessTokenSecret: Ti.App.Properties.getString('tumblrAccessTokenSecret', '')
 		});
 
-	var logger = require('Logger').create('./');
-	logger.setLogLevel(logger.LEVEL_NONE);
+	var lib = require('lib');
+	lib.Log.setLogLevel(lib.Log.LEVEL_NONE);
 
-	var dashboard = require('tumblrDashboard').Dashboard(tumblr, logger);
+	var dashboard = require('tumblrDashboard').Dashboard(tumblr);
 
 	var tabGroup = Ti.UI.createTabGroup();
 
 	// メインウインドウ構築
 	var Window = require('ui/common/MainWindow');
-	var wnd = new Window(dashboard, logger);
+	var wnd = new Window(dashboard);
 
 	var mainTab = Ti.UI.createTab({ window: wnd });
 	wnd.containingTab = mainTab;

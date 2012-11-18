@@ -23,6 +23,13 @@ module.exports = (function(global){
 		return this.UI_ = require('lib/UI');
 	});
 
+	// Logプロパティ
+	lib.prototype.__defineGetter__("Log", function(){
+		if (this.Log_)
+			return this.Log_;
+		return this.Log_ = require('lib/Log');
+	});
+
 	/////////////////////////////////////////
 	// メソッド
 	/////////////////////////////////////////

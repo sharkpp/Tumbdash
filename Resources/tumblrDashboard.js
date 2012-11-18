@@ -9,7 +9,7 @@ var exports = exports || this;
 exports.Dashboard = (function(global){
 	var K = function(){};
 
-	var Dashboard = function(tumblr, logger) {
+	var Dashboard = function(tumblr) {
 		var self;
 
 		if (this instanceof Dashboard) {
@@ -20,9 +20,9 @@ exports.Dashboard = (function(global){
 
 		tumblr.addEventListener('login', function(e) {
 				if (e.success) {
-self.log.debug('login suceess');
-//self.log.debug('tumblrAccessTokenKey=' + e.accessTokenKey);
-//self.log.debug('tumblrAccessTokenSecret=' + e.accessTokenSecret);
+lib.Log.debug('login suceess');
+//lib.Log.debug('tumblrAccessTokenKey=' + e.accessTokenKey);
+//lib.Log.debug('tumblrAccessTokenSecret=' + e.accessTokenSecret);
 					Ti.App.Properties.setString('tumblrAccessTokenKey',    e.accessTokenKey);
 					Ti.App.Properties.setString('tumblrAccessTokenSecret', e.accessTokenSecret);
 					//
@@ -66,7 +66,6 @@ self.log.debug('login suceess');
 		self.blogs = [];
 		self.listeners = {};
 		self.tumblr = tumblr;
-		self.log = logger;
 		self.pinBuffer  = []; // PINバッファ
 		self.cacheData  = {}; // post id : 投稿内容
 		self.cacheList  = []; // 順序 : post id のリスト
@@ -94,6 +93,8 @@ self.log.debug('login suceess');
 	};
 
 	K.prototype = Dashboard.prototype;
+
+	var lib = require('lib');
 
 	// Return codes
 	Dashboard.prototype.STATUS_OK      = 200; // 200: OK
@@ -263,7 +264,7 @@ self.log.debug('login suceess');
 						var postId = post['id'];
 						var existPost = undefined != self.cacheData[postId];
 						self.cacheData[postId] = post;
-self.log.debug('recv post #'+postId+' '+(existPost?'(already exist)':''));
+lib.Log.debug('recv post #'+postId+' '+(existPost?'(already exist)':''));
 						if (!existPost) {
 							self.cacheList.push(postId);
 							readCount++;
@@ -312,7 +313,7 @@ self.log.debug('recv post #'+postId+' '+(existPost?'(already exist)':''));
 				}
 				else {
 // 未テスト
-self.log.debug('dashboard request failed!');
+lib.Log.debug('dashboard request failed!');
 					var readContinued = 0 < self.requestQue.length;
 					// 読み取り失敗を通知
 					setTimeout(function(){ self.fireEvent('readPost', {readCount: -1, continued: readContinued}); }, 1);
@@ -393,16 +394,16 @@ self.log.debug('dashboard request failed!');
 			options['comment'] = req['comment'];
 		}
 
-self.log.debug('reblog start #'+req['id']+' queue:'+self.reblogQueue.length);
+lib.Log.debug('reblog start #'+req['id']+' queue:'+self.reblogQueue.length);
 
 		var timeoutAccepted = false;
 		var idTimeout = setTimeout(function() {
 								timeoutAccepted = true;
-self.log.debug('reblog timeout queue:'+self.reblogQueue.length);
+lib.Log.debug('reblog timeout queue:'+self.reblogQueue.length);
 								var reblogQueue0 = self.reblogQueue.shift(); // PIN一覧には残る
 								if (reblogQueue0) {
 									var id = reblogQueue0['id']; // なんかえらーになる？
-self.log.debug('reblog timeout #'+id+' queue:'+self.reblogQueue.length);
+lib.Log.debug('reblog timeout #'+id+' queue:'+self.reblogQueue.length);
 									setTimeout(function(){ self.fireEvent('reblog', id); }, 1);
 								}
 								// 次のキューを処理
@@ -418,7 +419,7 @@ self.log.debug('reblog timeout #'+id+' queue:'+self.reblogQueue.length);
 				if (timeoutAccepted) {
 					return;
 				}
-self.log.debug('reblog suceess "'+e.result.text+'"');
+lib.Log.debug('reblog suceess "'+e.result.text+'"');
 				var wait = 1;
 				var reblogQueue0 = self.reblogQueue.shift();
 				if (reblogQueue0) {
@@ -606,7 +607,7 @@ self.log.debug('reblog suceess "'+e.result.text+'"');
 		var self   = this;
 		var index  = typeof data['index'] == 'undefined' ? -1 : data['index'];
 		var reverse= typeof data['reverse'] != 'undefined';
-self.log.debug('jump to #1 '+index+','+reverse+' ('+self.cacheIndex+','+self.cacheList.length+')');
+lib.Log.debug('jump to #1 '+index+','+reverse+' ('+self.cacheIndex+','+self.cacheList.length+')');
 		if (index < 0 || self.cacheList.length <= index) {
 			return false;
 		}
@@ -621,7 +622,7 @@ self.log.debug('jump to #1 '+index+','+reverse+' ('+self.cacheIndex+','+self.cac
 					direction: direction,
 					pos: index,
 				});
-self.log.debug('jump to #2 '+result.success+','+result.index);
+lib.Log.debug('jump to #2 '+result.success+','+result.index);
 			if (!result.success) {
 				if (0 <= result.index && result.index < self.cacheList.length) {
 					setTimeout(function(){ fetchCommand.call(self, [
@@ -642,9 +643,9 @@ self.log.debug('jump to #2 '+result.success+','+result.index);
 			}
 			index = result.index;
 		}
-self.log.debug('jump to #3 '+index+' ('+self.cacheIndex+','+self.cacheList.length+')'+self.currentId());
+lib.Log.debug('jump to #3 '+index+' ('+self.cacheIndex+','+self.cacheList.length+')'+self.currentId());
 		self.cacheIndex = index;
-self.log.debug('jump to #4 '+index+' ('+self.cacheIndex+','+self.cacheList.length+')'+self.currentId());
+lib.Log.debug('jump to #4 '+index+' ('+self.cacheIndex+','+self.cacheList.length+')'+self.currentId());
 		//
 		if (isEmptyCachedPost.call(self, self.currentId())) {
 			setTimeout(function(){ self.fireEvent('loading', self.currentId()); }, 1);
@@ -676,7 +677,7 @@ self.log.debug('jump to #4 '+index+' ('+self.cacheIndex+','+self.cacheList.lengt
 					top  += self.cacheIndex - last;
 					last += self.cacheIndex - last;
 				}
-self.log.debug('cache sweep range '+top+'/'+last+' ('+self.cacheIndex+','+self.cacheList.length+')');
+lib.Log.debug('cache sweep range '+top+'/'+last+' ('+self.cacheIndex+','+self.cacheList.length+')');
 				for (var i = self.cacheList.length - 1; 0 <= i; i--) {
 					if (i < top || last <= i) {
 						self.sweepPosts.push(self.cacheList[i]);
@@ -697,7 +698,7 @@ self.log.debug('cache sweep range '+top+'/'+last+' ('+self.cacheIndex+','+self.c
 			if (!self.sweepPosts.length) {
 				return;
 			}
-self.log.debug('cache sweep target '+self.sweepPosts.length);
+lib.Log.debug('cache sweep target '+self.sweepPosts.length);
 		}
 
 		var timeout = false;
@@ -705,14 +706,14 @@ self.log.debug('cache sweep target '+self.sweepPosts.length);
 
 		var curId = self.cacheList[self.cacheIndex];
 
-self.log.debug('cache sweep start '+self.cacheList.length);
+lib.Log.debug('cache sweep start '+self.cacheList.length);
 
 		while (self.sweepPosts.length && !timeout) {
 			var id = self.sweepPosts.shift();
 			delete self.cacheData[id];
 			var fileName = String.format("%s/%s.json", self.cacheDir, ''+id);
 			var file = Ti.Filesystem.getFile(fileName);
-self.log.debug('cache sweep delete #'+id+' "'+fileName+(file.exists()?'" (exist)':'"'));
+lib.Log.debug('cache sweep delete #'+id+' "'+fileName+(file.exists()?'" (exist)':'"'));
 			if (file.exists()) {
 				file.deleteFile();
 			}
@@ -728,7 +729,7 @@ self.log.debug('cache sweep delete #'+id+' "'+fileName+(file.exists()?'" (exist)
 			}
 		}
 
-self.log.debug('cache sweep stop '+self.cacheList.length);
+lib.Log.debug('cache sweep stop '+self.cacheList.length);
 
 		self.cacheIndex = 0;
 		for (var i = 0, num = self.cacheList.length; i < num; i++) {

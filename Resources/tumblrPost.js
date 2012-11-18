@@ -9,7 +9,7 @@ var exports = exports || this;
 exports.tumblrPost = (function(global){
 	var K = function(){};
 
-	var tumblrPost = function(logger) {
+	var tumblrPost = function() {
 		var self;
 
 		if (this instanceof tumblrPost) {
@@ -17,8 +17,6 @@ exports.tumblrPost = (function(global){
 		} else {
 			self = new K();
 		}
-
-		self.log = logger;
 
 		self.baseDir_ = ''; // 基準ディレクトリが変化したか？のチェック用
 		self.updateProperties();
@@ -28,6 +26,8 @@ exports.tumblrPost = (function(global){
 	};
 
 	K.prototype = tumblrPost.prototype;
+
+	var lib = require('lib');
 
 	// テンプレートを読み込み
 	function loadTemplate() {

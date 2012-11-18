@@ -61,15 +61,11 @@ module.exports = (function(global){
 			}
 		}
 
-		// レイアウト適用モジュールを読み込み
-		var UiLayouter = require('UiLayouter');
-		var layout;
-
 		self.window = lib.UI.createLightWindow({
 				backgroundColor: 'black',
 				opacity: 0.7,
 			});
-		layout = new UiLayouter('PinDialog');
+			var layout = lib.UI.createLayouter('PinDialog');
 
 		var view = Ti.UI.createView({ 
 				backgroundColor: 'lightgray',

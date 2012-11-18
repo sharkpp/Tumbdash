@@ -36,17 +36,13 @@ module.exports = (function(global){
 		self.cancel  = options['cancel'] || -1;
 		self.value   = options['value'] || '';
 
-		// レイアウト適用モジュールを読み込み
-		var UiLayouter = require('UiLayouter');
-		var layout;
-
 		var isAndroid = Ti.Platform.osname === 'android';
 
 		self.window = lib.UI.createLightWindow({
 				backgroundColor: 'black',
 				opacity: 0.7,
 			});
-		layout = new UiLayouter('CommentDialog');
+		var layout = lib.UI.createLayouter('CommentDialog');
 
 		var view = Ti.UI.createView({ 
 				backgroundColor: 'lightgray',

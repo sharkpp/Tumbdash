@@ -211,6 +211,12 @@ module.exports = (function(global){
 		return v;
 	};
 
+	// createLayouter(params)
+	UI.prototype.createLayouter = function(params){
+		var Layouter = require('lib/UI/Layouter');
+		return new Layouter(params);
+	};
+
 	// インスタンスを生成して返す	
 	return this_ = new UI;
 })(this);

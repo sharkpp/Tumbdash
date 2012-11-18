@@ -1,6 +1,6 @@
 //MainWindow Component Constructor
 
-function MainWindow(dashboard, logger) {
+function MainWindow(dashboard) {
 	//determine platform and form factor and render approproate components
 	var osname  = Ti.Platform.osname,
 		version = Ti.Platform.version,
@@ -14,9 +14,7 @@ function MainWindow(dashboard, logger) {
 
 	var lib = require('lib');
 
-	// レイアウト適用モジュールを読み込み
-	var UiLayouter = require('UiLayouter');
-	var layout;
+	var layout = lib.UI.createLayouter('MainWindow');
 
 	var cacheLoaded = false;
 
@@ -61,9 +59,9 @@ function MainWindow(dashboard, logger) {
 		var debugMode = Ti.App.Properties.getBool('debugMode', false);
 		debugConsole.visible = debugMode;
 		// ログレベル指定
-		logger.setBaseDir(baseDir.nativePath);
-		logger.setLogLevel(debugMode ? logger.LEVEL_DEBUG : logger.LEVEL_NONE);
-logger.debug(JSON.stringify(tagsForReblog));
+		lib.Log.setLogDir(baseDir.nativePath);
+		lib.Log.setLogLevel(debugMode ? lib.Log.LEVEL_DEBUG : lib.Log.LEVEL_NONE);
+lib.Log.debug(JSON.stringify(tagsForReblog));
 	}
 
 	var checkAuthorized = function() {
@@ -167,7 +165,7 @@ logger.debug(JSON.stringify(tagsForReblog));
 				id: dashboard.currentId(),
 			});
 		dlg.addEventListener('click', function(e){
-logger.debug(''+e.position);
+lib.Log.debug(''+e.position);
 				jumpPostid = e.id;
 				if (0 < e.id) {
 					var index = dashboard.findPost(e.id);
@@ -183,7 +181,7 @@ logger.debug(''+e.position);
 
 	//
 
-	var posts = require('tumblrPost').tumblrPost(logger);
+	var posts = require('tumblrPost').tumblrPost();
 
 	var eventBlock = false;
 
@@ -197,8 +195,6 @@ logger.debug(''+e.position);
 
 	var self = lib.UI.createWindow(wndOptions);
 	var view = Ti.UI.createView();
-
-	layout = new UiLayouter('MainWindow');
 
 	// 各UIを初期化
 
@@ -380,12 +376,12 @@ logger.debug(''+e.position);
 		self.addEventListener('open', function(){
 				var activity = self.activity; // openの後でないと取得できない
 				activity.addEventListener('resume', function() {
-logger.debug('resume');
+lib.Log.debug('resume');
 						dashboard.loadCache();
 						dashboard.reloadCache();
 					});
 				activity.addEventListener('pause', function() {
-logger.debug('pause');
+lib.Log.debug('pause');
 						dashboard.saveCache();
 					});
 				var pinClearId = 1;
@@ -467,7 +463,7 @@ logger.debug('pause');
 		});
 
 	self.addEventListener('close', function(){
-logger.debug('close');
+lib.Log.debug('close');
 			if (!savePinState) {
 				dashboard.pinClear();
 			}

@@ -1,8 +1,8 @@
 // UI layout module
 //
 // usage:
-//   var UiLayouter = require('UiLayouter');
-//   var layouter = new UiLayouter('');
+//   var lib = require('lib');
+//   var layouter = lib.UI.createLayouter('hoge');
 //   layouter.addLayout('header', header);
 //   layouter.addLayout('body',   body);
 //   layouter.addLayout('footer', footer);
@@ -10,10 +10,10 @@
 module.exports = (function(global){
 	var K = function(){};
 
-	var UiLayouter = function(layoutName){
+	var Layouter = function(layoutName){
 		var self;
 
-		if (this instanceof UiLayouter) {
+		if (this instanceof Layouter) {
 			self = this;
 		} else {
 			self = new K();
@@ -30,7 +30,7 @@ module.exports = (function(global){
 		applyLayout.call(self);
 	};
 
-	K.prototype = UiLayouter.prototype;
+	K.prototype = Layouter.prototype;
 
 	// レイアウトを適用
 	function applyLayout() {
@@ -121,7 +121,7 @@ module.exports = (function(global){
 	//-----------------------------------------------------
 
 	// レイアウトの対象に含める項目を追加
-	UiLayouter.prototype.addItem = function(itemName, item) {
+	Layouter.prototype.addItem = function(itemName, item) {
 		var self = this;
 		// アイテム名とオブジェクトを保存
 		self.items = self.items || {};
@@ -130,5 +130,5 @@ module.exports = (function(global){
 		applyLayoutOnce.call(self, itemName);
 	};
 
-	return UiLayouter;
+	return Layouter;
 })(this);
