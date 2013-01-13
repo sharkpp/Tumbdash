@@ -32,6 +32,8 @@ module.exports = (function(global){
 
 	K.prototype = Layouter.prototype;
 
+	var lib = require('lib');
+
 	// レイアウトを適用
 	function applyLayout() {
 		var self = this;

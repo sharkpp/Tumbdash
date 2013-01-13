@@ -63,6 +63,12 @@ module.exports = (function(global){
 				file.write(file.read() + data);
 			}
 		}
+		switch (level) {
+		case self.LEVEL_ERROR:   Ti.API.error(message); break;
+		case self.LEVEL_WARNING: Ti.API.warning(message); break;
+		case self.LEVEL_INFO:    Ti.API.info(message); break;
+		case self.LEVEL_DEBUG:   Ti.API.debug(message); break;
+		}
 	}
 
 	/////////////////////////////////////////

@@ -98,6 +98,13 @@ exports.tumblrPost = (function(global){
 			var disp_photo = { url: '', width: 0 };
 			if (self.photoSize < 0 && photo['original_size']) {
 				disp_photo = photo['original_size'];
+				var url = disp_photo.url;
+				disp_photo.url = self.imageDir + '/' + url.split('/').pop();
+				// ファイルキャッシュに存在しない場合はネットから取得
+				var imagePath = Ti.Filesystem.getFile(disp_photo.url);
+				if (!imagePath.exists()) {
+//					disp_photo.url = url;
+				}
 			}
 			else {
 				// 指定サイズを超えない最大の画像を選ぶ
@@ -106,6 +113,13 @@ exports.tumblrPost = (function(global){
 					if (alt_size['width'] <= self.photoSize &&
 						disp_photo['width'] < alt_size['width']) {
 						disp_photo = alt_size;
+						var url = disp_photo.url;
+						disp_photo.url = self.imageDir + '/' + url.split('/').pop();
+						// ファイルキャッシュに存在しない場合はネットから取得
+						var imagePath = Ti.Filesystem.getFile(disp_photo.url);
+						if (!imagePath.exists()) {
+//							disp_photo.url = url;
+						}
 					}
 				}
 			}
@@ -231,6 +245,8 @@ exports.tumblrPost = (function(global){
 		// 基準ディレクトリ
 		self.baseDir = Ti.App.Properties.getString('baseDir', '');
 		self.baseDir = 'file://' + self.baseDir.replace(/^file:\/\//, '');
+		//
+		self.imageDir = self.baseDir + '/image';
 		//
 		self.pref = {
 				autoLoadVideo:    self.autoLoadVideo    ? 'true' : 'false',

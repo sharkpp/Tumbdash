@@ -30,6 +30,20 @@ module.exports = (function(global){
 		return this.Log_ = require('lib/Log');
 	});
 
+	// Platformプロパティ
+	lib.prototype.__defineGetter__("Platform", function(){
+		if (this.Platform_)
+			return this.Platform_;
+		return this.Platform_ = require('lib/Platform');
+	});
+
+	// Jobプロパティ
+	lib.prototype.__defineGetter__("Job", function(){
+		if (this.Job_)
+			return this.Job_;
+		return this.Job_ = require('lib/Job');
+	});
+
 	/////////////////////////////////////////
 	// メソッド
 	/////////////////////////////////////////

@@ -61,6 +61,7 @@ function MainWindow(dashboard) {
 		// ログレベル指定
 		lib.Log.setLogDir(baseDir.nativePath);
 		lib.Log.setLogLevel(debugMode ? lib.Log.LEVEL_DEBUG : lib.Log.LEVEL_NONE);
+//lib.Log.setLogLevel(lib.Log.LEVEL_NONE);
 lib.Log.debug(JSON.stringify(tagsForReblog));
 	}
 
@@ -90,27 +91,26 @@ lib.Log.debug(JSON.stringify(tagsForReblog));
 
 	var updateConsole = function() {
 		if (debugConsole.visible) {
-			var stateText = {};
-			stateText[dashboard.STATE_INITIAL]           = 'INITIAL';
-			stateText[dashboard.STATE_WAIT_LOGIN]        = 'WAIT_LOGIN';
-			stateText[dashboard.STATE_REQUEST_USER_INFO] = 'REQUEST_USER_INFO';
-			stateText[dashboard.STATE_REQUEST_DASHBOARD] = 'REQUEST_DASHBOARD';
-			stateText[dashboard.STATE_IDLE]              = 'IDLE';
-			//
+			var state = dashboard.getState();
 			debugConsole.value
 				= String.format(
-					"state:%s\n" +
+					"foreground:%s\n" +
+					"background:%s\n" +
+					"network:%s(%s)\n" +
 					"cache total:%d\n" +
 					"cache pos:%d\n" +
-					"active cache:%d\n" +
-					"command queue:%d\n" +
+					"active cache:%d(%d-%d)\n" +
 					"pin:%d\n" +
 					"ID:%s %s",
-					stateText[dashboard.getState()],
+					state.foreground,
+					state.background,
+					state.network,
+					state.networkSlot,
 					dashboard.totalPost(),
 					dashboard.currentPost(),
-					dashboard.activeCachePost(),
-					dashboard.restCommand(),
+					dashboard.activeCacheCount(),
+					dashboard.activeCacheTop(),
+					dashboard.activeCacheLast(),
 					dashboard.totalPin(),
 					''+dashboard.currentId(),
 					dashboard.pinState() ? '(pinned)' : ''
@@ -609,6 +609,11 @@ lib.Log.debug('close');
 					dashboard.saveCache();
 				}
 			}
+		});
+
+	dashboard.addEventListener('debug', function() {
+			// デバッグ
+			updateConsole();
 		});
 
 	Ti.App.addEventListener("linkclick", function(e) {
